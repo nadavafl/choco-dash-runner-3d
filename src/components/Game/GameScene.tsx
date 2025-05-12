@@ -1,0 +1,275 @@
+
+import React, { useRef, useState, useEffect } from 'react';
+import { useFrame } from '@react-three/fiber';
+import * as THREE from 'three';
+import Player from './Player';
+import Track from './Track';
+import Obstacle from './Obstacle';
+import Collectible from './Collectible';
+import Apple from './Apple';
+
+interface GameSceneProps {
+  onCollectSyringe: () => void;
+  onCollectApple: () => void;
+  onHitObstacle: () => void;
+  onGameOver: () => void;
+  lives: number;
+}
+
+interface GameObject {
+  id: number;
+  position: THREE.Vector3;
+  type: 'obstacle' | 'syringe' | 'apple';
+}
+
+const GameScene: React.FC<GameSceneProps> = ({ 
+  onCollectSyringe, 
+  onCollectApple,
+  onHitObstacle,
+  onGameOver,
+  lives 
+}) => {
+  const speedRef = useRef(50);
+  const playerRef = useRef<THREE.Group>(null);
+  const [playerPosition, setPlayerPosition] = useState<THREE.Vector3>(new THREE.Vector3(0, 0.5, 0));
+  const [gameObjects, setGameObjects] = useState<GameObject[]>([]);
+  const [lanes] = useState([-3, 0, 3]); // Left, center, right
+  const [currentLane, setCurrentLane] = useState(1); // Start in center lane (index 1)
+  const gameObjectsRef = useRef<GameObject[]>([]);
+  const nextObjectId = useRef(0);
+  const spawnTimerRef = useRef(0);
+  const movingRef = useRef(false);
+  const laneChangeSpeed = 5;
+  const gameActiveRef = useRef<boolean>(true);
+
+  // Set up keyboard controls
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (!gameActiveRef.current) return;
+      
+      if (e.key === 'ArrowLeft' || e.key === 'a') {
+        moveLeft();
+      } else if (e.key === 'ArrowRight' || e.key === 'd') {
+        moveRight();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [currentLane]);
+
+  // Watch lives change
+  useEffect(() => {
+    if (lives <= 0 && gameActiveRef.current) {
+      gameActiveRef.current = false;
+      setTimeout(() => onGameOver(), 500); // Small delay before game over
+    }
+  }, [lives, onGameOver]);
+
+  // Move player left
+  const moveLeft = () => {
+    if (currentLane > 0 && !movingRef.current) {
+      movingRef.current = true;
+      setCurrentLane(currentLane - 1);
+    }
+  };
+
+  // Move player right
+  const moveRight = () => {
+    if (currentLane < lanes.length - 1 && !movingRef.current) {
+      movingRef.current = true;
+      setCurrentLane(currentLane + 1);
+    }
+  };
+
+  // Spawn new objects
+  const spawnObject = () => {
+    if (!gameActiveRef.current) return;
+    
+    // Collect all used lanes so we don't spawn more than 2 objects in a row
+    const usedLanes: number[] = [];
+    const objectsInRow = gameObjectsRef.current.filter(obj => 
+      obj.position.z < -95 && obj.position.z > -105
+    );
+    
+    objectsInRow.forEach(obj => {
+      const laneIndex = lanes.findIndex(lane => Math.abs(lane - obj.position.x) < 0.5);
+      if (laneIndex >= 0) usedLanes.push(laneIndex);
+    });
+    
+    // Determine how many objects to spawn in this row (increased chance of 2 objects)
+    let objectsToSpawn = 1;
+    
+    // 60% chance to spawn 2 objects (increased from previous percentage)
+    if (Math.random() < 0.6 && usedLanes.length < 2) {
+      objectsToSpawn = 2;
+    }
+    
+    for (let i = 0; i < objectsToSpawn; i++) {
+      // If we already have 2 objects in this row, don't spawn more
+      if (usedLanes.length >= 2) break;
+      
+      // Get available lanes to spawn in
+      const availableLanes = lanes
+        .map((_, index) => index)
+        .filter(index => !usedLanes.includes(index));
+      
+      if (availableLanes.length === 0) break;
+      
+      // Choose a random available lane
+      const laneIndex = availableLanes[Math.floor(Math.random() * availableLanes.length)];
+      usedLanes.push(laneIndex); // Mark this lane as used
+      
+      // Determine what kind of object to spawn
+      const random = Math.random();
+      let type: 'obstacle' | 'syringe' | 'apple';
+      
+      if (random < 0.6) {
+        type = 'obstacle'; // 60% chance for obstacle
+      } else if (random < 0.9) {
+        type = 'apple';   // 30% chance for apple (increased from 25%)
+      } else {
+        type = 'syringe'; // 10% chance for syringe (reduced from 15%)
+      }
+      
+      const newObject: GameObject = {
+        id: nextObjectId.current++,
+        position: new THREE.Vector3(
+          lanes[laneIndex],
+          type === 'obstacle' ? 0.75 : 1.2, // Different heights for obstacles and collectibles
+          -100 // Start far away and come toward the player
+        ),
+        type
+      };
+
+      gameObjectsRef.current = [...gameObjectsRef.current, newObject];
+    }
+    
+    setGameObjects(gameObjectsRef.current);
+  };
+
+  // Check collisions between player and objects
+  const checkCollisions = () => {
+    if (!playerRef.current || !gameActiveRef.current) return;
+    
+    const playerBounds = new THREE.Box3().setFromObject(playerRef.current);
+    
+    gameObjectsRef.current = gameObjectsRef.current.filter(obj => {
+      // Skip objects that are behind the player
+      if (obj.position.z > 2) return false;
+      
+      // Check if object is close enough for potential collision
+      if (obj.position.z < 0 || obj.position.z > 2) return true;
+      
+      // Calculate approximate distance to determine collision
+      const distance = Math.sqrt(
+        Math.pow(playerPosition.x - obj.position.x, 2) +
+        Math.pow(playerPosition.z - obj.position.z, 2)
+      );
+      
+      if (distance < 1.5) {
+        // Collision detected
+        if (obj.type === 'syringe') {
+          onCollectSyringe();
+          return false; // Remove syringe
+        } else if (obj.type === 'apple') {
+          onCollectApple();
+          return false; // Remove apple
+        } else {
+          onHitObstacle();
+          return false; // Remove obstacle
+        }
+      }
+      
+      return true;
+    });
+    
+    setGameObjects(gameObjectsRef.current);
+  };
+
+  // Main game loop
+  useFrame((_, delta) => {
+    if (!gameActiveRef.current) return;
+    
+    // Increase game speed over time
+    speedRef.current = Math.min(30, speedRef.current + delta * 0.1);
+    
+    // Update player position - smooth lane transition
+    const targetX = lanes[currentLane];
+    const newX = THREE.MathUtils.lerp(playerPosition.x, targetX, delta * laneChangeSpeed);
+    setPlayerPosition(prev => new THREE.Vector3(newX, prev.y, prev.z));
+    
+    if (Math.abs(playerPosition.x - targetX) < 0.1) {
+      movingRef.current = false;
+    }
+    
+    // Move existing objects
+    gameObjectsRef.current = gameObjectsRef.current.map(obj => ({
+      ...obj,
+      position: new THREE.Vector3(
+        obj.position.x,
+        obj.position.y,
+        obj.position.z + delta * speedRef.current
+      )
+    }));
+    setGameObjects(gameObjectsRef.current);
+    
+    // Spawn new objects - Slightly increased spawn rate
+    spawnTimerRef.current -= delta;
+    if (spawnTimerRef.current <= 0) {
+      spawnObject();
+      spawnTimerRef.current = 0.4 + Math.random() * 1.2; // Reduced from 0.5-2 to 0.4-1.6 seconds
+    }
+    
+    // Check collisions
+    checkCollisions();
+  });
+
+  return (
+    <>
+      {/* Water Environment Lighting - Bright blue tint */}
+      <ambientLight intensity={0.8} color="#E6F2FF" />
+      <directionalLight
+        position={[10, 20, 5]}
+        intensity={1.2}
+        castShadow
+        shadow-mapSize={[2048, 2048]}
+        shadow-camera-far={50}
+        shadow-camera-left={-20}
+        shadow-camera-right={20}
+        shadow-camera-top={20}
+        shadow-camera-bottom={-20}
+        color="#FFF8DC"
+      />
+      <pointLight position={[0, 10, 5]} intensity={0.8} color="#33C3F0" />
+      
+      {/* Bridge and Water Environment */}
+      <fog attach="fog" args={['#E6F2FF', 30, 90]} />
+      <Track speed={speedRef.current} />
+      
+      {/* Player */}
+      <Player 
+        position={playerPosition} 
+        ref={playerRef} 
+        speed={speedRef.current} 
+      />
+
+      {/* Game Objects (Obstacles & Collectibles) */}
+      {gameObjects.map(obj => (
+        obj.type === 'obstacle' ? 
+          <Obstacle key={obj.id} position={obj.position} /> :
+          obj.type === 'syringe' ?
+            <Collectible key={obj.id} position={obj.position} /> :
+            <Apple key={obj.id} position={obj.position} />
+      ))}
+
+      {/* Shadow catcher for bridge */}
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.1, 0]} receiveShadow>
+        <planeGeometry args={[10, 200]} />
+        <shadowMaterial transparent opacity={0.4} />
+      </mesh>
+    </>
+  );
+};
+
+export default GameScene;
