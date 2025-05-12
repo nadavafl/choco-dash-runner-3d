@@ -41,7 +41,7 @@ const RegistrationScreen: React.FC<RegistrationScreenProps> = ({
   const handleRegistration = async (values: z.infer<typeof formSchema>) => {
     setIsSubmitting(true);
     try {
-      // Google Apps Script endpoint - needs to be replaced with actual deployed script URL
+      // Google Apps Script endpoint with sheetbest
       const apiEndpoint =
         "https://api.sheetbest.com/sheets/1b628773-b56f-49e5-9d99-a65d24282f22";
       
