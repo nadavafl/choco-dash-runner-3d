@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import {
   Dialog,
@@ -54,13 +55,15 @@ const DiabetesCheckDialog: React.FC<DiabetesCheckDialogProps> = ({
     setIsSubmitting(true);
 
     try {
-      // This would normally be an environment variable or configured endpoint
-      const apiEndpoint =
-        "https://script.google.com/macros/s/YOUR_GOOGLE_SCRIPT_ID/exec";
+      // When you deploy your Google Apps Script, replace this with your actual script ID
+      // Currently, the code uses a placeholder which won't work
+      const apiEndpoint = 
+        "https://script.google.com/macros/s/YOUR_ACTUAL_GOOGLE_SCRIPT_ID_HERE/exec";
 
-      const response = await fetch(apiEndpoint, {
+      // Using no-cors mode since Google Scripts often have CORS restrictions
+      await fetch(apiEndpoint, {
         method: "POST",
-        mode: "no-cors", // Using no-cors as Google Scripts have CORS restrictions
+        mode: "no-cors", 
         headers: {
           "Content-Type": "application/json",
         },
@@ -70,8 +73,6 @@ const DiabetesCheckDialog: React.FC<DiabetesCheckDialogProps> = ({
         }),
       });
 
-      // Since we're using no-cors, we can't actually know if it succeeded
-      // So we'll assume it did if no error is thrown
       toast.success("Blood glucose reading submitted", {
         description: "Thank you for tracking your diabetes data.",
       });
