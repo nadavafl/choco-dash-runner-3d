@@ -23,10 +23,12 @@ import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { Check, Syringe } from "lucide-react";
 import { toast } from "sonner";
+import axios from "axios";
 
 interface DiabetesCheckDialogProps {
   open: boolean;
-  onComplete: () => void;
+  onComplete: (bloodGlucose: string) => void;
+  username: string;
 }
 
 const formSchema = z.object({
@@ -41,6 +43,7 @@ const formSchema = z.object({
 const DiabetesCheckDialog: React.FC<DiabetesCheckDialogProps> = ({
   open,
   onComplete,
+  username,
 }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -55,38 +58,26 @@ const DiabetesCheckDialog: React.FC<DiabetesCheckDialogProps> = ({
     setIsSubmitting(true);
 
     try {
-      // When you deploy your Google Apps Script, replace this with your actual script ID
-      // Currently, the code uses a placeholder which won't work
-      const apiEndpoint = 
-        "https://script.google.com/macros/s/YOUR_ACTUAL_GOOGLE_SCRIPT_ID_HERE/exec";
-
-      // Using no-cors mode since Google Scripts often have CORS restrictions
-      await fetch(apiEndpoint, {
-        method: "POST",
-        mode: "no-cors", 
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          bloodGlucose: values.bloodGlucose,
-          timestamp: new Date().toISOString(),
-        }),
-      });
-
       toast.success("Blood glucose reading submitted", {
         description: "Thank you for tracking your diabetes data.",
       });
 
       form.reset();
-      onComplete();
+      onComplete(values.bloodGlucose);
     } catch (error) {
       console.error("Error submitting blood glucose reading:", error);
       toast.error("Failed to submit reading", {
         description: "Please try again or play without submitting.",
       });
-    } finally {
       setIsSubmitting(false);
     }
+  };
+
+  const handleSkip = () => {
+    toast.info("Submission skipped", {
+      description: "Remember to track your levels regularly!",
+    });
+    onComplete("");
   };
 
   return (
@@ -127,12 +118,7 @@ const DiabetesCheckDialog: React.FC<DiabetesCheckDialogProps> = ({
                 type="button"
                 variant="outline"
                 disabled={isSubmitting}
-                onClick={() => {
-                  toast.info("Submission skipped", {
-                    description: "Remember to track your levels regularly!",
-                  });
-                  onComplete();
-                }}
+                onClick={handleSkip}
               >
                 Skip for now
               </Button>
