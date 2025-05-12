@@ -58,24 +58,14 @@ const DiabetesCheckDialog: React.FC<DiabetesCheckDialogProps> = ({
     setIsSubmitting(true);
 
     try {
-      // This would normally be an environment variable or configured endpoint
       const apiEndpoint =
         "https://api.sheetbest.com/sheets/1b628773-b56f-49e5-9d99-a65d24282f22";
 
-      const response = await fetch(apiEndpoint, {
-        method: "POST",
-        mode: "no-cors", // Using no-cors as Google Scripts have CORS restrictions
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          bloodGlucose: values.bloodGlucose,
-          timestamp: new Date().toISOString(),
-        }),
+      await axios.post(apiEndpoint, {
+        bloodGlucose: values.bloodGlucose,
+        timestamp: new Date().toISOString(),
       });
 
-      // Since we're using no-cors, we can't actually know if it succeeded
-      // So we'll assume it did if no error is thrown
       toast.success("Blood glucose reading submitted", {
         description: "Thank you for tracking your diabetes data.",
       });
@@ -87,9 +77,11 @@ const DiabetesCheckDialog: React.FC<DiabetesCheckDialogProps> = ({
       toast.error("Failed to submit reading", {
         description: "Please try again or play without submitting.",
       });
+    } finally {
       setIsSubmitting(false);
     }
   };
+  
 
   const handleSkip = () => {
     toast.info("Submission skipped", {
