@@ -37,9 +37,8 @@ const GameOverScreen: React.FC<GameOverScreenProps> = ({
 
   const updateGoogleSheet = async (username: string, bloodGlucose: string, gameScore: string) => {
     try {
-      // Replace with your actual Google Apps Script URL
-      const apiEndpoint = 
-        "https://script.google.com/macros/s/YOUR_ACTUAL_GOOGLE_SCRIPT_ID_HERE/exec";
+      const apiEndpoint =
+        "https://api.sheetbest.com/sheets/1b628773-b56f-49e5-9d99-a65d24282f22";
       
       await axios({
         method: "PUT",
@@ -47,7 +46,7 @@ const GameOverScreen: React.FC<GameOverScreenProps> = ({
         data: {
           username,
           bloodGlucose,
-          gameScore,
+          // gameScore,
         },
         headers: {
           "Content-Type": "application/json",

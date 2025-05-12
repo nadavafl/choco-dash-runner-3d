@@ -48,7 +48,7 @@ const RegistrationScreen: React.FC<RegistrationScreenProps> = ({
       const data = {
         username: values.username,
         bloodGlucose: "",
-        gameScore: "",
+        // gameScore: "",
         timestamp: new Date().toISOString(),
       };
 
