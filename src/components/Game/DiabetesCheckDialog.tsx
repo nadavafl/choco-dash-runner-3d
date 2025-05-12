@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import {
   Dialog,
@@ -22,10 +23,12 @@ import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { Check, Syringe } from "lucide-react";
 import { toast } from "sonner";
+import axios from "axios";
 
 interface DiabetesCheckDialogProps {
   open: boolean;
-  onComplete: () => void;
+  onComplete: (bloodGlucose: string) => void;
+  username: string;
 }
 
 const formSchema = z.object({
@@ -40,6 +43,7 @@ const formSchema = z.object({
 const DiabetesCheckDialog: React.FC<DiabetesCheckDialogProps> = ({
   open,
   onComplete,
+  username,
 }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -56,7 +60,7 @@ const DiabetesCheckDialog: React.FC<DiabetesCheckDialogProps> = ({
     try {
       // This would normally be an environment variable or configured endpoint
       const apiEndpoint =
-        "https://api.sheetbest.com/sheets/1b628773-b56f-49e5-9d99-a65d24282f22";
+        "https://script.google.com/macros/s/YOUR_GOOGLE_SCRIPT_ID/exec";
 
       const response = await fetch(apiEndpoint, {
         method: "POST",
@@ -77,15 +81,21 @@ const DiabetesCheckDialog: React.FC<DiabetesCheckDialogProps> = ({
       });
 
       form.reset();
-      onComplete();
+      onComplete(values.bloodGlucose);
     } catch (error) {
       console.error("Error submitting blood glucose reading:", error);
       toast.error("Failed to submit reading", {
         description: "Please try again or play without submitting.",
       });
-    } finally {
       setIsSubmitting(false);
     }
+  };
+
+  const handleSkip = () => {
+    toast.info("Submission skipped", {
+      description: "Remember to track your levels regularly!",
+    });
+    onComplete("");
   };
 
   return (
@@ -126,12 +136,7 @@ const DiabetesCheckDialog: React.FC<DiabetesCheckDialogProps> = ({
                 type="button"
                 variant="outline"
                 disabled={isSubmitting}
-                onClick={() => {
-                  toast.info("Submission skipped", {
-                    description: "Remember to track your levels regularly!",
-                  });
-                  onComplete();
-                }}
+                onClick={handleSkip}
               >
                 Skip for now
               </Button>

@@ -6,12 +6,14 @@ import GameScene from './GameScene';
 import HUD from './HUD';
 import GameOverScreen from './GameOverScreen';
 import StartScreen from './StartScreen';
+import RegistrationScreen from './RegistrationScreen';
 
 const GameContainer: React.FC = () => {
-  const [gameState, setGameState] = useState<'start' | 'playing' | 'gameover'>('start');
+  const [gameState, setGameState] = useState<'register' | 'start' | 'playing' | 'gameover'>('register');
   const [score, setScore] = useState(0);
   const [highScore, setHighScore] = useState(0);
   const [lives, setLives] = useState(3);
+  const [username, setUsername] = useState("");
   const scoreRef = useRef(0);
   const livesRef = useRef(3);
 
@@ -43,6 +45,11 @@ const GameContainer: React.FC = () => {
       setGameState('gameover');
     }
   }, [lives, gameState]);
+
+  const handleRegistrationComplete = (registeredUsername: string) => {
+    setUsername(registeredUsername);
+    setGameState('start');
+  };
 
   const handleStartGame = () => {
     setScore(0);
@@ -84,6 +91,10 @@ const GameContainer: React.FC = () => {
         )}
       </Canvas>
 
+      {gameState === 'register' && (
+        <RegistrationScreen onRegistrationComplete={handleRegistrationComplete} />
+      )}
+
       {gameState === 'start' && (
         <StartScreen onStartGame={handleStartGame} highScore={highScore} />
       )}
@@ -96,7 +107,8 @@ const GameContainer: React.FC = () => {
         <GameOverScreen 
           score={score} 
           highScore={highScore} 
-          onRestart={handleStartGame} 
+          onRestart={handleStartGame}
+          username={username} 
         />
       )}
     </div>

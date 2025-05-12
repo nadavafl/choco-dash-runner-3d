@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
@@ -9,23 +10,54 @@ import {
 } from "@/components/ui/card";
 import { Trophy, Rocket } from "lucide-react";
 import DiabetesCheckDialog from "./DiabetesCheckDialog";
+import axios from "axios";
 
 interface GameOverScreenProps {
   score: number;
   highScore: number;
   onRestart: () => void;
+  username: string;
 }
 
 const GameOverScreen: React.FC<GameOverScreenProps> = ({
   score,
   highScore,
   onRestart,
+  username,
 }) => {
   const isNewHighScore = score >= highScore;
   const [showDiabetesCheck, setShowDiabetesCheck] = useState(true);
 
-  const handleDiabetesCheckComplete = () => {
+  const handleDiabetesCheckComplete = (bloodGlucose: string) => {
     setShowDiabetesCheck(false);
+    
+    // Update the Google Sheet with the blood glucose value and score
+    updateGoogleSheet(username, bloodGlucose, score.toString());
+  };
+
+  const updateGoogleSheet = async (username: string, bloodGlucose: string, gameScore: string) => {
+    try {
+      // Replace with your actual Google Apps Script URL
+      const apiEndpoint = 
+        "https://script.google.com/macros/s/YOUR_ACTUAL_GOOGLE_SCRIPT_ID_HERE/exec";
+      
+      await axios({
+        method: "PUT",
+        url: apiEndpoint,
+        data: {
+          username,
+          bloodGlucose,
+          gameScore,
+        },
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      
+      console.log("Google Sheet updated successfully");
+    } catch (error) {
+      console.error("Error updating Google Sheet:", error);
+    }
   };
 
   const handlePlayAgain = () => {
@@ -77,6 +109,7 @@ const GameOverScreen: React.FC<GameOverScreenProps> = ({
       <DiabetesCheckDialog
         open={showDiabetesCheck}
         onComplete={handleDiabetesCheckComplete}
+        username={username}
       />
     </div>
   );
