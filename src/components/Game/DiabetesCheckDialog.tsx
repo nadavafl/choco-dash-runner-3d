@@ -56,7 +56,7 @@ const DiabetesCheckDialog: React.FC<DiabetesCheckDialogProps> = ({
     try {
       // This would normally be an environment variable or configured endpoint
       const apiEndpoint =
-        "https://script.google.com/macros/s/YOUR_GOOGLE_SCRIPT_ID/exec";
+        "https://api.sheetbest.com/sheets/1b628773-b56f-49e5-9d99-a65d24282f22";
 
       const response = await fetch(apiEndpoint, {
         method: "POST",
