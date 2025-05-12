@@ -1,8 +1,14 @@
-
-import React from 'react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Trophy, Rocket } from 'lucide-react';
+import React, { useState } from "react";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Trophy, Rocket } from "lucide-react";
+import DiabetesCheckDialog from "./DiabetesCheckDialog";
 
 interface GameOverScreenProps {
   score: number;
@@ -10,8 +16,23 @@ interface GameOverScreenProps {
   onRestart: () => void;
 }
 
-const GameOverScreen: React.FC<GameOverScreenProps> = ({ score, highScore, onRestart }) => {
+const GameOverScreen: React.FC<GameOverScreenProps> = ({
+  score,
+  highScore,
+  onRestart,
+}) => {
   const isNewHighScore = score >= highScore;
+  const [showDiabetesCheck, setShowDiabetesCheck] = useState(true);
+
+  const handleDiabetesCheckComplete = () => {
+    setShowDiabetesCheck(false);
+  };
+
+  const handlePlayAgain = () => {
+    onRestart();
+    // Reset the diabetes check dialog for next game over
+    setShowDiabetesCheck(true);
+  };
 
   return (
     <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-80">
@@ -26,7 +47,7 @@ const GameOverScreen: React.FC<GameOverScreenProps> = ({ score, highScore, onRes
             <p className="text-game-light text-xl">Your Score</p>
             <p className="text-3xl font-bold text-game-primary">{score}</p>
           </div>
-          
+
           <div className="space-y-2">
             <div className="flex items-center justify-center gap-2">
               <Trophy className="h-5 w-5 text-yellow-500" />
@@ -34,7 +55,7 @@ const GameOverScreen: React.FC<GameOverScreenProps> = ({ score, highScore, onRes
             </div>
             <p className="text-2xl font-bold text-game-accent">{highScore}</p>
           </div>
-          
+
           {isNewHighScore && (
             <div className="py-2 px-4 bg-game-accent bg-opacity-20 rounded-md animate-pulse-glow">
               <p className="text-game-accent font-bold">NEW HIGH SCORE!</p>
@@ -42,15 +63,21 @@ const GameOverScreen: React.FC<GameOverScreenProps> = ({ score, highScore, onRes
           )}
         </CardContent>
         <CardFooter>
-          <Button 
-            onClick={onRestart} 
+          <Button
+            onClick={handlePlayAgain}
             className="w-full bg-game-primary hover:bg-game-secondary text-white flex items-center justify-center gap-2"
+            disabled={showDiabetesCheck}
           >
             <Rocket className="h-5 w-5" />
             PLAY AGAIN
           </Button>
         </CardFooter>
       </Card>
+
+      <DiabetesCheckDialog
+        open={showDiabetesCheck}
+        onComplete={handleDiabetesCheckComplete}
+      />
     </div>
   );
 };
