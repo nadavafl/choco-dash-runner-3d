@@ -13,19 +13,19 @@ const Bridge: React.FC<BridgeProps> = ({ speed }) => {
   // 🌊 טעינת המרקמים של הגשר
   const colorMap = useLoader(
     TextureLoader,
-    "/textures/bridge/Planks010_4K-PNG_Color.png"
+    "/textures/bridge/Planks010_4K-PNG_Color.jpg"
   );
   const roughnessMap = useLoader(
     TextureLoader,
-    "/textures/bridge/Planks010_4K-PNG_Roughness.png"
+    "/textures/bridge/Planks010_4K-PNG_Roughness.jpg"
   );
   const normalMap = useLoader(
     TextureLoader,
-    "/textures/bridge/Planks010_4K-PNG_NormalGL.png"
+    "/textures/bridge/Planks010_4K-PNG_NormalGL.jpg"
   );
   const aoMap = useLoader(
     TextureLoader,
-    "/textures/bridge/Planks010_4K-PNG_AmbientOcclusion.png"
+    "/textures/bridge/Planks010_4K-PNG_AmbientOcclusion.jpg"
   );
 
   useEffect(() => {
