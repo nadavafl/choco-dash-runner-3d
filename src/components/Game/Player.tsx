@@ -8,7 +8,7 @@ interface PlayerProps {
 }
 
 const Player = forwardRef<THREE.Group, PlayerProps>(({ position }, ref) => {
-  const { scene } = useGLTF("/models/super_bunny_final.glb");
+  const { scene } = useGLTF("/models/low_poly_scooter_draco.glb");
 
   // Adjusted position to be on top of the bridge
   const adjustedPosition = new THREE.Vector3(
