@@ -21,9 +21,10 @@ import {
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
-import { Check, Syringe } from "lucide-react";
+import { Check, Syringe, AlertTriangle } from "lucide-react";
 import { toast } from "sonner";
 import axios from "axios";
+import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 
 interface DiabetesCheckDialogProps {
   open: boolean;
@@ -46,6 +47,10 @@ const DiabetesCheckDialog: React.FC<DiabetesCheckDialogProps> = ({
   username,
 }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [feedbackMessage, setFeedbackMessage] = useState<{
+    message: string;
+    type: "low" | "normal" | "high" | null;
+  }>({ message: "", type: null });
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -56,6 +61,26 @@ const DiabetesCheckDialog: React.FC<DiabetesCheckDialogProps> = ({
 
   const submitReading = async (values: z.infer<typeof formSchema>) => {
     setIsSubmitting(true);
+    
+    // Determine feedback message based on blood glucose value
+    const bloodGlucoseValue = Number(values.bloodGlucose);
+    
+    if (bloodGlucoseValue < 80) {
+      setFeedbackMessage({
+        message: "Low blood sugar – please eat something and retest.",
+        type: "low",
+      });
+    } else if (bloodGlucoseValue >= 80 && bloodGlucoseValue < 120) {
+      setFeedbackMessage({
+        message: "Well done! Your test result is normal!",
+        type: "normal",
+      });
+    } else {
+      setFeedbackMessage({
+        message: "You need to take care of yourself immediately and retest afterward.",
+        type: "high",
+      });
+    }
 
     try {
       const apiEndpoint =
@@ -69,9 +94,6 @@ const DiabetesCheckDialog: React.FC<DiabetesCheckDialogProps> = ({
       toast.success("Blood glucose reading submitted", {
         description: "Thank you for tracking your diabetes data.",
       });
-
-      form.reset();
-      onComplete(values.bloodGlucose);
     } catch (error) {
       console.error("Error submitting blood glucose reading:", error);
       toast.error("Failed to submit reading", {
@@ -82,6 +104,11 @@ const DiabetesCheckDialog: React.FC<DiabetesCheckDialogProps> = ({
     }
   };
   
+  const handleContinue = () => {
+    form.reset();
+    onComplete(form.getValues().bloodGlucose);
+    setFeedbackMessage({ message: "", type: null });
+  };
 
   const handleSkip = () => {
     toast.info("Submission skipped", {
@@ -123,23 +150,51 @@ const DiabetesCheckDialog: React.FC<DiabetesCheckDialogProps> = ({
               )}
             />
 
+            {feedbackMessage.type && (
+              <Alert className={`
+                ${feedbackMessage.type === "low" ? "bg-[#FEC6A1] border-orange-400" : ""} 
+                ${feedbackMessage.type === "normal" ? "bg-[#F2FCE2] border-green-400" : ""}
+                ${feedbackMessage.type === "high" ? "bg-[#ea384c] text-white border-red-600" : ""}
+              `}>
+                <AlertTriangle className={`h-4 w-4 ${feedbackMessage.type === "high" ? "text-white" : ""}`} />
+                <AlertTitle className={`${feedbackMessage.type === "high" ? "text-white" : "text-[#403E43]"}`}>
+                  Blood Glucose Alert
+                </AlertTitle>
+                <AlertDescription className={`${feedbackMessage.type === "high" ? "text-white" : "text-[#403E43]"}`}>
+                  {feedbackMessage.message}
+                </AlertDescription>
+              </Alert>
+            )}
+
             <DialogFooter className="gap-2 flex-col sm:flex-row sm:justify-between">
-              <Button
-                type="button"
-                variant="outline"
-                disabled={isSubmitting}
-                onClick={handleSkip}
-              >
-                Skip for now
-              </Button>
-              <Button
-                type="submit"
-                disabled={isSubmitting}
-                className="flex items-center gap-2"
-              >
-                <Check className="h-4 w-4" />
-                {isSubmitting ? "Submitting..." : "Submit Reading"}
-              </Button>
+              {!feedbackMessage.type ? (
+                <>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    disabled={isSubmitting}
+                    onClick={handleSkip}
+                  >
+                    Skip for now
+                  </Button>
+                  <Button
+                    type="submit"
+                    disabled={isSubmitting}
+                    className="flex items-center gap-2"
+                  >
+                    <Check className="h-4 w-4" />
+                    {isSubmitting ? "Submitting..." : "Submit Reading"}
+                  </Button>
+                </>
+              ) : (
+                <Button
+                  type="button"
+                  onClick={handleContinue}
+                  className="flex items-center gap-2 w-full sm:w-auto"
+                >
+                  Continue
+                </Button>
+              )}
             </DialogFooter>
           </form>
         </Form>
