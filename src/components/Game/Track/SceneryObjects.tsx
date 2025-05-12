@@ -15,7 +15,7 @@ const PalmTreeModel: React.FC<{
   rotationZ: number;
   scale?: number;
 }> = ({ position, rotationZ, scale = 1 }) => {
-  const { scene } = useGLTF("/models/palm_trees.glb");
+  const { scene } = useGLTF("/models/palm_trees_draco.glb");
 
   return (
     <primitive
