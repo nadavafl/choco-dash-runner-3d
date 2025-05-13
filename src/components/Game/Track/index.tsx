@@ -6,12 +6,26 @@ import Water from './Water';
 import Beach from './Beach';
 import Bridge from './Bridge';
 import SceneryObjects from './SceneryObjects';
+import { useThree } from '@react-three/fiber';
 
 interface TrackProps {
   speed: number;
 }
 
 const Track: React.FC<TrackProps> = ({ speed }) => {
+  const { gl } = useThree();
+  
+  // Log renderer capabilities for debugging
+  React.useEffect(() => {
+    console.log("WebGL Renderer Info:", {
+      version: gl.getParameter(gl.VERSION),
+      vendor: gl.getParameter(gl.VENDOR),
+      renderer: gl.getParameter(gl.RENDERER),
+      maxTextures: gl.getParameter(gl.MAX_TEXTURE_IMAGE_UNITS),
+      extensions: gl.getSupportedExtensions()
+    });
+  }, [gl]);
+
   return (
     <>
       {/* Environment components */}
@@ -21,7 +35,7 @@ const Track: React.FC<TrackProps> = ({ speed }) => {
       <Bridge speed={speed} />
       <SceneryObjects speed={speed} />
       
-      {/* Lighting and atmosphere */}
+      {/* Lighting and atmosphere - reduced complexity for mobile */}
       <ambientLight intensity={0.7} color="#F8F8FF" />
       <directionalLight position={[50, 100, 20]} intensity={1.2} color="#FFF8DC" castShadow />
       <pointLight position={[30, 0, 20]} intensity={0.6} color="#33C3F0" distance={20} />
