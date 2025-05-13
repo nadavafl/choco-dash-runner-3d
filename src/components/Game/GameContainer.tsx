@@ -81,7 +81,7 @@ const GameContainer: React.FC = () => {
 
   return (
     <div className="w-full h-screen relative">
-      <Canvas shadows camera={{ position: [0, 5, 10], fov: 70 }}>
+      {/* <Canvas shadows camera={{ position: [0, 5, 10], fov: 70 }}>
         {gameState === 'playing' && (
           <GameScene 
             onCollectSyringe={handleCollectSyringe}
@@ -91,7 +91,7 @@ const GameContainer: React.FC = () => {
             lives={lives}
           />
         )}
-      </Canvas>
+      </Canvas> */}
 
       {gameState === 'register' && (
         <RegistrationScreen onRegistrationComplete={handleRegistrationComplete} />
