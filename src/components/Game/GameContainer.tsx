@@ -101,18 +101,18 @@ const GameContainer: React.FC = () => {
         <StartScreen onStartGame={handleStartGame} highScore={highScore} />
       )}
 
-      {/* {gameState === 'playing' && (
+       {gameState === 'playing' && (
         <HUD score={score} highScore={highScore} lives={lives} />
-      )} */}
+      )} 
 
-      {/* {gameState === 'gameover' && (
+      {gameState === 'gameover' && (
         <GameOverScreen 
           score={score} 
           highScore={highScore} 
           onRestart={handleStartGame}
           username={username} 
         />
-      )} */}
+      )} 
 
       {/* Enhanced touch controls instructions for mobile devices */}
       {isMobile && gameState === 'playing' && (
