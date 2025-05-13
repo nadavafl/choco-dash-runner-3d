@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import { Canvas } from '@react-three/fiber';
 import GameScene from './GameScene';
@@ -113,9 +114,9 @@ const GameContainer: React.FC = () => {
         />
       )}
 
-      {/* Enhanced touch controls instructions for mobile */}
+      {/* Enhanced touch controls instructions for mobile devices */}
       {isMobile && gameState === 'playing' && (
-        <div className="fixed bottom-10 left-0 right-0 text-center text-white text-base bg-black bg-opacity-70 py-4 z-50 mx-auto pointer-events-none">
+        <div className="fixed bottom-10 left-0 right-0 text-center text-white text-xl bg-black bg-opacity-80 py-4 z-50 mx-auto pointer-events-none animate-pulse-glow">
           Swipe left or right to move
         </div>
       )}
