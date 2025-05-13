@@ -21,9 +21,7 @@ const Track: React.FC<TrackProps> = ({ speed }) => {
     const webGLContext = gl.getContext();
     
     console.log("WebGL Renderer Info:", {
-      version: gl.getVersion(),
-      renderer: gl.info.renderer,
-      vendor: gl.info.vendor,
+      renderer: gl.info.render,
       memory: gl.info.memory,
       programs: gl.info.programs
     });
