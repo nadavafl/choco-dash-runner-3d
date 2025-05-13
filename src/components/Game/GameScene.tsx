@@ -44,6 +44,27 @@ const GameScene: React.FC<GameSceneProps> = ({
   const laneChangeSpeed = 5;
   const gameActiveRef = useRef<boolean>(true);
   const isMobile = useIsMobile();
+  
+  // Clean up function to prevent memory leaks and DataCloneError
+  useEffect(() => {
+    // Initialize game state
+    gameObjectsRef.current = [];
+    setGameObjects([]);
+    nextObjectId.current = 0;
+    gameActiveRef.current = true;
+    
+    // Cleanup function to properly dispose objects when component unmounts
+    return () => {
+      // Set game as inactive first
+      gameActiveRef.current = false;
+      
+      // Clear all game objects to prevent cloning issues
+      gameObjectsRef.current = [];
+      setGameObjects([]);
+      
+      console.log("GameScene cleanup completed");
+    };
+  }, []);
 
   // Set up keyboard controls
   useEffect(() => {
@@ -135,6 +156,7 @@ const GameScene: React.FC<GameSceneProps> = ({
         type = 'syringe'; // 10% chance for syringe (reduced from 15%)
       }
       
+      // Create a simple serializable object (no functions, DOM nodes, or circular references)
       const newObject: GameObject = {
         id: nextObjectId.current++,
         position: new THREE.Vector3(
@@ -145,19 +167,25 @@ const GameScene: React.FC<GameSceneProps> = ({
         type
       };
 
-      gameObjectsRef.current = [...gameObjectsRef.current, newObject];
+      // Update game objects using a safe copy approach
+      const updatedObjects = [...gameObjectsRef.current, newObject];
+      gameObjectsRef.current = updatedObjects;
     }
     
-    setGameObjects(gameObjectsRef.current);
+    // Update state safely
+    setGameObjects([...gameObjectsRef.current]);
   };
 
   // Check collisions between player and objects
   const checkCollisions = () => {
     if (!playerRef.current || !gameActiveRef.current) return;
     
-    const playerBounds = new THREE.Box3().setFromObject(playerRef.current);
+    // Use a simple distance-based collision detection instead of Box3
+    // This avoids potential issues with complex Three.js objects and cloning
+    const playerPos = playerPosition;
     
-    gameObjectsRef.current = gameObjectsRef.current.filter(obj => {
+    // Filter objects safely using basic types
+    const remainingObjects = gameObjectsRef.current.filter(obj => {
       // Skip objects that are behind the player
       if (obj.position.z > 2) return false;
       
@@ -166,8 +194,8 @@ const GameScene: React.FC<GameSceneProps> = ({
       
       // Calculate approximate distance to determine collision
       const distance = Math.sqrt(
-        Math.pow(playerPosition.x - obj.position.x, 2) +
-        Math.pow(playerPosition.z - obj.position.z, 2)
+        Math.pow(playerPos.x - obj.position.x, 2) +
+        Math.pow(playerPos.z - obj.position.z, 2)
       );
       
       if (distance < 1.5) {
@@ -187,7 +215,9 @@ const GameScene: React.FC<GameSceneProps> = ({
       return true;
     });
     
-    setGameObjects(gameObjectsRef.current);
+    // Update game objects reference and state
+    gameObjectsRef.current = remainingObjects;
+    setGameObjects([...remainingObjects]);
   };
 
   // Main game loop
@@ -206,16 +236,22 @@ const GameScene: React.FC<GameSceneProps> = ({
       movingRef.current = false;
     }
     
-    // Move existing objects
-    gameObjectsRef.current = gameObjectsRef.current.map(obj => ({
-      ...obj,
-      position: new THREE.Vector3(
-        obj.position.x,
-        obj.position.y,
-        obj.position.z + delta * speedRef.current
-      )
-    }));
-    setGameObjects(gameObjectsRef.current);
+    // Move existing objects using a safe approach to avoid cloning issues
+    const updatedObjects = gameObjectsRef.current.map(obj => {
+      // Create a new object with updated position to avoid mutation
+      return {
+        ...obj,
+        position: new THREE.Vector3(
+          obj.position.x,
+          obj.position.y,
+          obj.position.z + delta * speedRef.current
+        )
+      };
+    });
+    
+    // Update ref and state
+    gameObjectsRef.current = updatedObjects;
+    setGameObjects([...updatedObjects]);
     
     // Spawn new objects - Slightly increased spawn rate
     spawnTimerRef.current -= delta;

@@ -10,6 +10,20 @@ interface StartScreenProps {
 }
 
 const StartScreen: React.FC<StartScreenProps> = ({ onStartGame, highScore }) => {
+  // Handle start game with error prevention
+  const handleStartGame = (e: React.MouseEvent) => {
+    e.preventDefault();
+    
+    try {
+      // Add small timeout to prevent state transition issues
+      setTimeout(() => {
+        onStartGame();
+      }, 10);
+    } catch (error) {
+      console.error("Error starting game:", error);
+    }
+  };
+
   return (
     <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-b from-game-dark to-black bg-opacity-80">
       <Card className="w-[350px] bg-game-dark border-game-primary">
@@ -34,7 +48,7 @@ const StartScreen: React.FC<StartScreenProps> = ({ onStartGame, highScore }) => 
         </CardContent>
         <CardFooter>
           <Button 
-            onClick={onStartGame} 
+            onClick={handleStartGame} 
             className="w-full bg-game-primary hover:bg-game-secondary text-white flex items-center justify-center gap-2"
           >
             <Rocket className="h-5 w-5" />

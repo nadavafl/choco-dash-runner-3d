@@ -54,11 +54,22 @@ const GameContainer: React.FC = () => {
   };
 
   const handleStartGame = () => {
-    setScore(0);
-    scoreRef.current = 0;
-    setLives(3);
-    livesRef.current = 3;
-    setGameState('playing');
+    // Reset game state before transitioning
+    try {
+      setScore(0);
+      scoreRef.current = 0;
+      setLives(3);
+      livesRef.current = 3;
+      
+      // Use setTimeout to ensure state updates complete before game starts
+      // This prevents possible DataCloneError during state transition
+      setTimeout(() => {
+        setGameState('playing');
+        console.log("Game state changed to playing");
+      }, 0);
+    } catch (error) {
+      console.error("Error starting game:", error);
+    }
   };
 
   const handleGameOver = () => {
