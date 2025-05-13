@@ -1,3 +1,4 @@
+
 import React, { forwardRef } from "react";
 import { useGLTF } from "@react-three/drei";
 import * as THREE from "three";
@@ -40,10 +41,13 @@ const Player = forwardRef<THREE.Group, PlayerProps>(({ position }, ref) => {
       receiveShadow
     >
       {/* Player Body - Explorer outfit */}
-      {/* Note: replaced old mesh with GLTF bunny model */}
+      {/* Note: using scooter model instead of bunny model */}
       <primitive object={scene} />
     </group>
   );
 });
+
+// Add preload for the model to ensure it's available
+useGLTF.preload("/models/low_poly_scooter_draco.glb");
 
 export default Player;
