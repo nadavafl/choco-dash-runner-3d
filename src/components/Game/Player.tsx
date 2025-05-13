@@ -21,7 +21,7 @@ const Player = forwardRef<THREE.Group, PlayerProps>(({ position }, ref) => {
   const scale = new THREE.Vector3(1, 1, 1); // הגדלה לפי הצורך (הייתה קודם 0.5)
 
   // 🎯 סיבוב של הדמות לכיוון הרצוי
-  scene.rotation.y = Math.PI / 2; // מסובב 180 מעלות
+  scene.rotation.y = Math.PI; // מסובב 180 מעלות
 
   // ☀️ הפעלת צל על כל חלקי המודל
   scene.traverse((child) => {
