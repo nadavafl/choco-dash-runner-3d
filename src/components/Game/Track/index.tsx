@@ -17,13 +17,28 @@ const Track: React.FC<TrackProps> = ({ speed }) => {
   
   // Log renderer capabilities for debugging
   React.useEffect(() => {
+    // Access the underlying WebGL context
+    const webGLContext = gl.getContext();
+    
     console.log("WebGL Renderer Info:", {
-      version: gl.getParameter(gl.VERSION),
-      vendor: gl.getParameter(gl.VENDOR),
-      renderer: gl.getParameter(gl.RENDERER),
-      maxTextures: gl.getParameter(gl.MAX_TEXTURE_IMAGE_UNITS),
-      extensions: gl.getSupportedExtensions()
+      version: gl.getVersion(),
+      renderer: gl.info.renderer,
+      vendor: gl.info.vendor,
+      memory: gl.info.memory,
+      programs: gl.info.programs
     });
+    
+    // Only attempt to access WebGL parameters if we have the context
+    if (webGLContext) {
+      try {
+        console.log("WebGL Context Parameters:", {
+          maxTextures: webGLContext.getParameter(webGLContext.MAX_TEXTURE_IMAGE_UNITS),
+          extensions: webGLContext.getSupportedExtensions()
+        });
+      } catch (err) {
+        console.error("Error getting WebGL parameters:", err);
+      }
+    }
   }, [gl]);
 
   return (
