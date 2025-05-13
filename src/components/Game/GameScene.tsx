@@ -31,7 +31,7 @@ const GameScene: React.FC<GameSceneProps> = ({
   onGameOver,
   lives 
 }) => {
-  const speedRef = useRef(50);
+  const speedRef = useRef(20);
   const playerRef = useRef<THREE.Group>(null);
   const [playerPosition, setPlayerPosition] = useState<THREE.Vector3>(new THREE.Vector3(0, 0.5, 0));
   const [gameObjects, setGameObjects] = useState<GameObject[]>([]);
