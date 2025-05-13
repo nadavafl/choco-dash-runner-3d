@@ -10,18 +10,20 @@ interface StartScreenProps {
 }
 
 const StartScreen: React.FC<StartScreenProps> = ({ onStartGame, highScore }) => {
-  // Handle start game with error prevention
+  // Handle start game with safer approach to prevent clone errors
   const handleStartGame = (e: React.MouseEvent) => {
     e.preventDefault();
     
-    try {
-      // Add small timeout to prevent state transition issues
-      setTimeout(() => {
+    // Use requestAnimationFrame for safer state transitions
+    // This prevents DataCloneError by ensuring DOM updates complete
+    // before complex state transitions occur
+    requestAnimationFrame(() => {
+      try {
         onStartGame();
-      }, 10);
-    } catch (error) {
-      console.error("Error starting game:", error);
-    }
+      } catch (error) {
+        console.error("Error starting game:", error);
+      }
+    });
   };
 
   return (

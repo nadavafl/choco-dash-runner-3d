@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { Canvas } from '@react-three/fiber';
 import GameScene from './GameScene';
@@ -18,6 +17,12 @@ const GameContainer: React.FC = () => {
   const scoreRef = useRef(0);
   const livesRef = useRef(3);
   const isMobile = useIsMobile();
+  const gameStateRef = useRef<'register' | 'start' | 'playing' | 'gameover'>('register');
+
+  useEffect(() => {
+    // Keep gameStateRef in sync with gameState to avoid stale closures
+    gameStateRef.current = gameState;
+  }, [gameState]);
 
   useEffect(() => {
     // Load high score from localStorage
@@ -55,21 +60,17 @@ const GameContainer: React.FC = () => {
 
   const handleStartGame = () => {
     // Reset game state before transitioning
-    try {
-      setScore(0);
-      scoreRef.current = 0;
-      setLives(3);
-      livesRef.current = 3;
-      
-      // Use setTimeout to ensure state updates complete before game starts
-      // This prevents possible DataCloneError during state transition
-      setTimeout(() => {
-        setGameState('playing');
-        console.log("Game state changed to playing");
-      }, 0);
-    } catch (error) {
-      console.error("Error starting game:", error);
-    }
+    setScore(0);
+    scoreRef.current = 0;
+    setLives(3);
+    livesRef.current = 3;
+    
+    // Use setTimeout to ensure state updates complete before game starts
+    // This helps prevent potential DataCloneError during state transition
+    setTimeout(() => {
+      setGameState('playing');
+      console.log("Game state changed to playing");
+    }, 50); // Small delay to ensure clean transitions
   };
 
   const handleGameOver = () => {
@@ -90,10 +91,11 @@ const GameContainer: React.FC = () => {
     setLives(prevLives => prevLives - 1);
   };
 
+  // Render canvas only when playing to avoid memory issues during transitions
   return (
     <div className="w-full h-screen relative">
-      <Canvas shadows camera={{ position: [0, 5, 10], fov: 70 }}>
-        {gameState === 'playing' && (
+      {gameState === 'playing' && (
+        <Canvas shadows camera={{ position: [0, 5, 10], fov: 70 }}>
           <GameScene 
             onCollectSyringe={handleCollectSyringe}
             onCollectApple={handleCollectApple}
@@ -101,8 +103,8 @@ const GameContainer: React.FC = () => {
             onGameOver={handleGameOver}
             lives={lives}
           />
-        )}
-      </Canvas> 
+        </Canvas>
+      )}
 
       {gameState === 'register' && (
         <RegistrationScreen onRegistrationComplete={handleRegistrationComplete} />
@@ -112,9 +114,9 @@ const GameContainer: React.FC = () => {
         <StartScreen onStartGame={handleStartGame} highScore={highScore} />
       )}
 
-       {gameState === 'playing' && (
+      {gameState === 'playing' && (
         <HUD score={score} highScore={highScore} lives={lives} />
-      )} 
+      )}
 
       {gameState === 'gameover' && (
         <GameOverScreen 
@@ -123,7 +125,7 @@ const GameContainer: React.FC = () => {
           onRestart={handleStartGame}
           username={username} 
         />
-      )} 
+      )}
 
       {/* Enhanced touch controls instructions for mobile devices */}
       {isMobile && gameState === 'playing' && (
