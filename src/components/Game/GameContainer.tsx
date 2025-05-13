@@ -96,13 +96,14 @@ const GameContainer: React.FC = () => {
     <div className="w-full h-screen relative">
       {gameState === 'playing' && (
         <Canvas shadows camera={{ position: [0, 5, 10], fov: 70 }}>
-          <GameScene 
+          {/* <GameScene 
             onCollectSyringe={handleCollectSyringe}
             onCollectApple={handleCollectApple}
             onHitObstacle={handleHitObstacle}
             onGameOver={handleGameOver}
             lives={lives}
-          />
+          /> */}
+          <color attach="background" args={["#333"]} />
         </Canvas>
       )}
 
