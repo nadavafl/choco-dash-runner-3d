@@ -40,8 +40,7 @@ const Player = forwardRef<THREE.Group, PlayerProps>(({ position }, ref) => {
       castShadow
       receiveShadow
     >
-      {/* Player Body - Explorer outfit */}
-      {/* Note: using scooter model instead of bunny model */}
+      {/* Player model - Using scooter model */}
       <primitive object={scene} />
     </group>
   );

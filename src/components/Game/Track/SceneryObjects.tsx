@@ -7,8 +7,6 @@ interface SceneryObjectsProps {
   speed: number;
 }
 
-
-
 // 🌴 קומפוננטת מודל עץ דקל
 const PalmTreeModel: React.FC<{
   position: THREE.Vector3;
@@ -28,7 +26,8 @@ const PalmTreeModel: React.FC<{
   );
 };
 
-
+// Ensure the palm tree model is preloaded
+useGLTF.preload("/models/palm_trees_draco.glb");
 
 const SceneryObjects: React.FC<SceneryObjectsProps> = ({ speed }) => {
   const treeRef = useRef<THREE.Mesh>(null); // 🔁 קבוצה שנזיזה בפריים
@@ -104,16 +103,6 @@ const SceneryObjects: React.FC<SceneryObjectsProps> = ({ speed }) => {
         }
       }
     });
-  // useFrame((_, delta) => {
-  //     if (
-  //       treeRef.current &&
-  //       treeRef.current.material instanceof THREE.MeshStandardMaterial
-  //     ) {
-  //       if (treeRef.current.material.map) {
-  //         treeRef.current.material.map.offset.y -= delta * speed * 0.001;
-  //       }
-  //     }
-  //   });
 
   return (
     <Suspense fallback={null}>
