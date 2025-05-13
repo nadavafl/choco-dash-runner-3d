@@ -5,6 +5,7 @@ import HUD from './HUD';
 import GameOverScreen from './GameOverScreen';
 import StartScreen from './StartScreen';
 import RegistrationScreen from './RegistrationScreen';
+import TouchControls from './TouchControls';
 import { useIsMobile } from '@/hooks/use-mobile';
 
 const GameContainer: React.FC = () => {
@@ -13,13 +14,10 @@ const GameContainer: React.FC = () => {
   const [highScore, setHighScore] = useState(0);
   const [lives, setLives] = useState(3);
   const [username, setUsername] = useState("");
-  const [canvasError, setCanvasError] = useState<string | null>(null);
-  const [canvasLoaded, setCanvasLoaded] = useState(false);
   const scoreRef = useRef(0);
   const livesRef = useRef(3);
   const isMobile = useIsMobile();
   const gameStateRef = useRef<'register' | 'start' | 'playing' | 'gameover'>('register');
-  const canvasContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     // Keep gameStateRef in sync with gameState to avoid stale closures
@@ -27,21 +25,12 @@ const GameContainer: React.FC = () => {
   }, [gameState]);
 
   useEffect(() => {
-    // Log device information for debugging
-    console.log("Device:", {
-      width: window.innerWidth,
-      height: window.innerHeight,
-      pixelRatio: window.devicePixelRatio,
-      isMobile,
-      userAgent: navigator.userAgent
-    });
-    
     // Load high score from localStorage
     const savedHighScore = localStorage.getItem('chocoDashHighScore');
     if (savedHighScore) {
       setHighScore(parseInt(savedHighScore));
     }
-  }, [isMobile]);
+  }, []);
 
   useEffect(() => {
     // Update high score if current score is higher
@@ -75,10 +64,9 @@ const GameContainer: React.FC = () => {
     scoreRef.current = 0;
     setLives(3);
     livesRef.current = 3;
-    setCanvasError(null);
-    setCanvasLoaded(false);
     
     // Use setTimeout to ensure state updates complete before game starts
+    // This helps prevent potential DataCloneError during state transition
     setTimeout(() => {
       setGameState('playing');
       console.log("Game state changed to playing");
@@ -103,63 +91,19 @@ const GameContainer: React.FC = () => {
     setLives(prevLives => prevLives - 1);
   };
 
-  const handleCanvasCreated = (state: any) => {
-    console.log("Canvas created:", state);
-    setCanvasLoaded(true);
-  };
-
-  const handleCanvasError = (error: any) => {
-    console.error("Canvas error:", error);
-    setCanvasError(error.message || "Failed to initialize 3D canvas");
-  };
-
   // Render canvas only when playing to avoid memory issues during transitions
   return (
-    <div className="w-full h-screen relative overflow-hidden" ref={canvasContainerRef}>
+    <div className="w-full h-screen relative">
       {gameState === 'playing' && (
-        <>
-          <Canvas 
-            shadows 
-            camera={{ position: [0, 5, 10], fov: 70 }} 
-            onCreated={handleCanvasCreated}
-            onError={handleCanvasError}
-            style={{ 
-              width: '100%', 
-              height: '100%',
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              touchAction: 'none'
-            }}
-          >
-            <GameScene 
-              onCollectSyringe={handleCollectSyringe}
-              onCollectApple={handleCollectApple}
-              onHitObstacle={handleHitObstacle}
-              onGameOver={handleGameOver}
-              lives={lives}
-            /> 
-            <color attach="background" args={[0.2, 0.2, 0.2]} />
-          </Canvas>
-
-          {!canvasLoaded && (
-            <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-80 z-50">
-              <div className="text-white text-lg">Loading game scene...</div>
-            </div>
-          )}
-          
-          {canvasError && (
-            <div className="absolute inset-0 flex flex-col items-center justify-center bg-black bg-opacity-80 z-50">
-              <div className="text-red-500 text-lg mb-4">Error: {canvasError}</div>
-              <button 
-                className="px-4 py-2 bg-red-600 text-white rounded"
-                onClick={() => setGameState('start')}
-              >
-                Return to Menu
-              </button>
-            </div>
-          )}
-        </>
+        <Canvas shadows camera={{ position: [0, 5, 10], fov: 70 }}>
+          <GameScene 
+            onCollectSyringe={handleCollectSyringe}
+            onCollectApple={handleCollectApple}
+            onHitObstacle={handleHitObstacle}
+            onGameOver={handleGameOver}
+            lives={lives}
+          />
+        </Canvas>
       )}
 
       {gameState === 'register' && (
