@@ -3,6 +3,8 @@ import React from 'react';
 import MinimalCanvas from '@/components/Game/MinimalCanvas';
 
 const TestCanvas = () => {
+  console.log("TestCanvas component rendering");
+  
   return (
     <div className="w-full h-screen bg-black">
       <MinimalCanvas />

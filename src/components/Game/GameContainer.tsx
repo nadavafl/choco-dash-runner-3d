@@ -139,7 +139,7 @@ const GameContainer: React.FC = () => {
               onGameOver={handleGameOver}
               lives={lives}
             /> 
-            <color attach="background" args={["#333"]} />
+            <color attach="background" args={[0.2, 0.2, 0.2]} />
           </Canvas>
 
           {!canvasLoaded && (

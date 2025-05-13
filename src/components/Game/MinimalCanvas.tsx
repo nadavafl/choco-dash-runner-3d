@@ -37,7 +37,7 @@ const MinimalCanvas: React.FC = () => {
       <ambientLight intensity={0.5} />
       <pointLight position={[10, 10, 10]} />
       <Box />
-      <color attach="background" args={["#333"]} />
+      <color attach="background" args={[0.2, 0.2, 0.2]} />
     </Canvas>
   );
 };
