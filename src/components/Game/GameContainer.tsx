@@ -81,7 +81,7 @@ const GameContainer: React.FC = () => {
 
   return (
     <div className="w-full h-screen relative">
-      {/* <Canvas shadows camera={{ position: [0, 5, 10], fov: 70 }}>
+      <Canvas shadows camera={{ position: [0, 5, 10], fov: 70 }}>
         {gameState === 'playing' && (
           <GameScene 
             onCollectSyringe={handleCollectSyringe}
@@ -91,7 +91,7 @@ const GameContainer: React.FC = () => {
             lives={lives}
           />
         )}
-      </Canvas> */}
+      </Canvas> 
 
       {gameState === 'register' && (
         <RegistrationScreen onRegistrationComplete={handleRegistrationComplete} />
@@ -101,18 +101,18 @@ const GameContainer: React.FC = () => {
         <StartScreen onStartGame={handleStartGame} highScore={highScore} />
       )}
 
-      {gameState === 'playing' && (
+      {/* {gameState === 'playing' && (
         <HUD score={score} highScore={highScore} lives={lives} />
-      )}
+      )} */}
 
-      {gameState === 'gameover' && (
+      {/* {gameState === 'gameover' && (
         <GameOverScreen 
           score={score} 
           highScore={highScore} 
           onRestart={handleStartGame}
           username={username} 
         />
-      )}
+      )} */}
 
       {/* Enhanced touch controls instructions for mobile devices */}
       {isMobile && gameState === 'playing' && (
