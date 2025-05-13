@@ -54,7 +54,7 @@ const StartScreen: React.FC<StartScreenProps> = ({ onStartGame, highScore }) => 
             className="w-full bg-game-primary hover:bg-game-secondary text-white flex items-center justify-center gap-2"
           >
             <Rocket className="h-5 w-5" />
-            START GAME!!
+            START GAME
           </Button>
         </CardFooter>
       </Card>
