@@ -113,9 +113,9 @@ const GameContainer: React.FC = () => {
         />
       )}
 
-      {/* Add touch controls instructions for mobile */}
+      {/* Enhanced touch controls instructions for mobile */}
       {isMobile && gameState === 'playing' && (
-        <div className="absolute bottom-5 left-0 right-0 text-center text-white text-sm bg-black bg-opacity-50 py-2">
+        <div className="fixed bottom-10 left-0 right-0 text-center text-white text-base bg-black bg-opacity-70 py-4 z-50 mx-auto pointer-events-none">
           Swipe left or right to move
         </div>
       )}
