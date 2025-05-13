@@ -7,6 +7,8 @@ import Track from './Track';
 import Obstacle from './Obstacle';
 import Collectible from './Collectible';
 import Apple from './Apple';
+import TouchControls from './TouchControls';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 interface GameSceneProps {
   onCollectSyringe: () => void;
@@ -41,6 +43,7 @@ const GameScene: React.FC<GameSceneProps> = ({
   const movingRef = useRef(false);
   const laneChangeSpeed = 5;
   const gameActiveRef = useRef<boolean>(true);
+  const isMobile = useIsMobile();
 
   // Set up keyboard controls
   useEffect(() => {
@@ -268,6 +271,14 @@ const GameScene: React.FC<GameSceneProps> = ({
         <planeGeometry args={[10, 200]} />
         <shadowMaterial transparent opacity={0.4} />
       </mesh>
+
+      {/* Add touch controls component for mobile devices */}
+      {isMobile && (
+        <TouchControls 
+          onSwipeLeft={moveLeft}
+          onSwipeRight={moveRight}
+        />
+      )}
     </>
   );
 };

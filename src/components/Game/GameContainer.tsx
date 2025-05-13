@@ -1,12 +1,12 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { Canvas } from '@react-three/fiber';
-import { OrbitControls } from '@react-three/drei';
 import GameScene from './GameScene';
 import HUD from './HUD';
 import GameOverScreen from './GameOverScreen';
 import StartScreen from './StartScreen';
 import RegistrationScreen from './RegistrationScreen';
+import TouchControls from './TouchControls';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 const GameContainer: React.FC = () => {
   const [gameState, setGameState] = useState<'register' | 'start' | 'playing' | 'gameover'>('register');
@@ -16,6 +16,7 @@ const GameContainer: React.FC = () => {
   const [username, setUsername] = useState("");
   const scoreRef = useRef(0);
   const livesRef = useRef(3);
+  const isMobile = useIsMobile();
 
   useEffect(() => {
     // Load high score from localStorage
@@ -110,6 +111,13 @@ const GameContainer: React.FC = () => {
           onRestart={handleStartGame}
           username={username} 
         />
+      )}
+
+      {/* Add touch controls instructions for mobile */}
+      {isMobile && gameState === 'playing' && (
+        <div className="absolute bottom-5 left-0 right-0 text-center text-white text-sm bg-black bg-opacity-50 py-2">
+          Swipe left or right to move
+        </div>
       )}
     </div>
   );
