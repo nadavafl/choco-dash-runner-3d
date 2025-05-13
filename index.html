@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -19,8 +20,28 @@
 
   <body>
     <div id="root"></div>
-    <!-- IMPORTANT: DO NOT REMOVE THIS SCRIPT TAG OR THIS VERY COMMENT! -->
-    <script src="https://cdn.gpteng.co/gptengineer.js" type="module"></script>
+    <!-- Modified script loading to avoid mobile issues -->
+    <script>
+      // Check if the device is likely mobile
+      function isMobileDevice() {
+        return (
+          window.innerWidth < 768 || 
+          /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
+          (navigator.maxTouchPoints && navigator.maxTouchPoints > 2)
+        );
+      }
+      
+      // Only load the script on desktop devices
+      if (!isMobileDevice()) {
+        const script = document.createElement('script');
+        script.src = 'https://cdn.gpteng.co/gptengineer.js';
+        script.type = 'module';
+        document.body.appendChild(script);
+        console.log('Lovable debug script loaded (desktop only)');
+      } else {
+        console.log('Lovable debug script skipped (mobile device detected)');
+      }
+    </script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
