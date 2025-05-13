@@ -95,26 +95,16 @@ const GameContainer: React.FC = () => {
   return (
     <div className="w-full h-screen relative">
       {gameState === 'playing' && (
-        // <Canvas shadows camera={{ position: [0, 5, 10], fov: 70 }}>
-        //    <GameScene 
-        //     onCollectSyringe={handleCollectSyringe}
-        //     onCollectApple={handleCollectApple}
-        //     onHitObstacle={handleHitObstacle}
-        //     onGameOver={handleGameOver}
-        //     lives={lives}
-        //   /> 
-        //   <color attach="background" args={["#333"]} />
-        // </Canvas>
-      <Canvas shadows camera={{ position: [0, 5, 10], fov: 70 }}>
-  <ambientLight />
-  <directionalLight position={[5, 10, 7]} intensity={1} castShadow />
-  <color attach="background" args={["#333"]} />
-  
-  <mesh position={[0, 1, 0]}>
-    <boxGeometry />
-    <meshStandardMaterial color="hotpink" />
-  </mesh>
-</Canvas>
+        <Canvas shadows camera={{ position: [0, 5, 10], fov: 70 }}>
+           <GameScene 
+            onCollectSyringe={handleCollectSyringe}
+            onCollectApple={handleCollectApple}
+            onHitObstacle={handleHitObstacle}
+            onGameOver={handleGameOver}
+            lives={lives}
+          /> 
+          <color attach="background" args={["#333"]} />
+        </Canvas>
 
       )}
 
