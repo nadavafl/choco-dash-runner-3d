@@ -94,35 +94,56 @@ interface HUDProps {
 const HUD: React.FC<HUDProps> = ({ score, highScore, lives }) => {
   return (
     <>
-      {/* Top HUD */}
-      <div className="absolute top-1 left-0 right-0 px-4 py-3 flex justify-between items-center">
+      {/* 🟢 דסקטופ: כל השלושה למעלה */}
+      <div className="hidden md:flex absolute top-0 left-0 right-0 px-4 py-3 justify-between items-center">
         {/* Score */}
         <Badge
           variant="outline"
-          className="bg-game-dark text-game-light px-3 py-1 text-sm md:text-base flex items-center gap-2"
+          className="bg-game-dark text-game-light px-3 py-1 text-base flex items-center gap-2"
         >
-          <Gamepad className="h-4 w-4" />
+          <Gamepad className="h-5 w-5" />
           <span>Score: {score}</span>
         </Badge>
 
-        {/* Lives - only on desktop */}
-        <div className="hidden md:block">
-          <div className="bg-game-dark bg-opacity-60 px-4 py-2 rounded-full">
-            <LivesDisplay lives={lives} />
-          </div>
+        {/* Lives */}
+        <div className="bg-game-dark bg-opacity-60 px-4 py-2 rounded-full">
+          <LivesDisplay lives={lives} />
         </div>
 
         {/* High Score */}
         <Badge
           variant="outline"
-          className="bg-game-dark text-game-light px-3 py-1 text-sm md:text-base flex items-center gap-2"
+          className="bg-game-dark text-game-light px-3 py-1 text-base flex items-center gap-2"
         >
-          <Trophy className="h-4 w-4 text-yellow-500" />
+          <Trophy className="h-5 w-5 text-yellow-500" />
           <span>High Score: {highScore}</span>
         </Badge>
       </div>
 
-      {/* Bottom HUD - only on mobile */}
+      {/* 🟡 מובייל: רק Score + High Score למעלה */}
+      <div className="flex md:hidden absolute top-0 left-0 right-0 px-4 py-3">
+        <div className="w-1/2 flex justify-start">
+          <Badge
+            variant="outline"
+            className="bg-game-dark text-game-light px-3 py-1 text-sm flex items-center gap-2"
+          >
+            <Gamepad className="h-4 w-4" />
+            <span>Score: {score}</span>
+          </Badge>
+        </div>
+
+        <div className="w-1/2 flex justify-end">
+          <Badge
+            variant="outline"
+            className="bg-game-dark text-game-light px-3 py-1 text-sm flex items-center gap-2"
+          >
+            <Trophy className="h-4 w-4 text-yellow-500" />
+            <span>High Score: {highScore}</span>
+          </Badge>
+        </div>
+      </div>
+
+      {/* 🟣 מובייל: Lives בתחתית המסך */}
       <div className="absolute bottom-3 left-1/2 transform -translate-x-1/2 block md:hidden">
         <div className="bg-game-dark bg-opacity-60 px-4 py-2 rounded-full">
           <LivesDisplay lives={lives} />
