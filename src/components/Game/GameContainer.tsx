@@ -18,6 +18,10 @@ const GameContainer: React.FC = () => {
   const livesRef = useRef(3);
   const isMobile = useIsMobile();
   const gameStateRef = useRef<'register' | 'start' | 'playing' | 'gameover'>('register');
+  
+  // Player movement controls - referenced by TouchControls
+  const [moveLeft, setMoveLeft] = useState<() => void>(() => () => {});
+  const [moveRight, setMoveRight] = useState<() => void>(() => () => {});
 
   useEffect(() => {
     // Keep gameStateRef in sync with gameState to avoid stale closures
@@ -102,6 +106,8 @@ const GameContainer: React.FC = () => {
             onHitObstacle={handleHitObstacle}
             onGameOver={handleGameOver}
             lives={lives}
+            setMoveLeft={setMoveLeft}
+            setMoveRight={setMoveRight}
           />
         </Canvas>
       )}
@@ -115,7 +121,10 @@ const GameContainer: React.FC = () => {
       )}
 
       {gameState === 'playing' && (
-        <HUD score={score} highScore={highScore} lives={lives} />
+        <>
+          <HUD score={score} highScore={highScore} lives={lives} />
+          {isMobile && <TouchControls onSwipeLeft={moveLeft} onSwipeRight={moveRight} />}
+        </>
       )}
 
       {gameState === 'gameover' && (

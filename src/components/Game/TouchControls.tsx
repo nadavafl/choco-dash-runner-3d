@@ -6,10 +6,13 @@ interface TouchControlsProps {
   onSwipeRight: () => void;
 }
 
+// Touch control component - attaches event handlers but doesn't render anything in 3D space
 const TouchControls: React.FC<TouchControlsProps> = ({ onSwipeLeft, onSwipeRight }) => {
   useEffect(() => {
+    // Touch gesture handling
     let touchStartX = 0;
     let touchEndX = 0;
+    const swipeThreshold = 50; // Minimum distance for a swipe to be registered
     
     const handleTouchStart = (e: TouchEvent) => {
       touchStartX = e.touches[0].clientX;
@@ -21,8 +24,6 @@ const TouchControls: React.FC<TouchControlsProps> = ({ onSwipeLeft, onSwipeRight
     };
     
     const handleSwipe = () => {
-      // Detect swipe direction
-      const swipeThreshold = 50; // Minimum distance for a swipe
       const swipeDistance = touchEndX - touchStartX;
       
       if (Math.abs(swipeDistance) < swipeThreshold) return; // Not a significant swipe
@@ -36,23 +37,19 @@ const TouchControls: React.FC<TouchControlsProps> = ({ onSwipeLeft, onSwipeRight
       }
     };
     
-    // Add touch event listeners
-    window.addEventListener('touchstart', handleTouchStart);
-    window.addEventListener('touchend', handleTouchEnd);
+    // Add event listeners
+    document.addEventListener('touchstart', handleTouchStart, { passive: true });
+    document.addEventListener('touchend', handleTouchEnd, { passive: true });
     
-    // Cleanup
+    // Clean up listeners on unmount
     return () => {
-      window.removeEventListener('touchstart', handleTouchStart);
-      window.removeEventListener('touchend', handleTouchEnd);
+      document.removeEventListener('touchstart', handleTouchStart);
+      document.removeEventListener('touchend', handleTouchEnd);
     };
   }, [onSwipeLeft, onSwipeRight]);
   
-  return (
-    <div 
-      className="absolute inset-0 z-10 touch-none" 
-      style={{ pointerEvents: 'none' }}
-    />
-  );
+  // This component doesn't render any 3D objects
+  return null;
 };
 
 export default TouchControls;

@@ -1,4 +1,3 @@
-
 import React, { useRef, useState, useEffect } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
@@ -16,6 +15,8 @@ interface GameSceneProps {
   onHitObstacle: () => void;
   onGameOver: () => void;
   lives: number;
+  setMoveLeft: React.Dispatch<React.SetStateAction<() => void>>;
+  setMoveRight: React.Dispatch<React.SetStateAction<() => void>>;
 }
 
 interface GameObject {
@@ -29,7 +30,9 @@ const GameScene: React.FC<GameSceneProps> = ({
   onCollectApple,
   onHitObstacle,
   onGameOver,
-  lives 
+  lives,
+  setMoveLeft,
+  setMoveRight
 }) => {
   const speedRef = useRef(20);
   const playerRef = useRef<THREE.Group>(null);
@@ -66,6 +69,28 @@ const GameScene: React.FC<GameSceneProps> = ({
     };
   }, []);
 
+  // Move player left
+  const moveLeft = () => {
+    if (currentLane > 0 && !movingRef.current) {
+      movingRef.current = true;
+      setCurrentLane(currentLane - 1);
+    }
+  };
+
+  // Move player right
+  const moveRight = () => {
+    if (currentLane < lanes.length - 1 && !movingRef.current) {
+      movingRef.current = true;
+      setCurrentLane(currentLane + 1);
+    }
+  };
+
+  // Expose movement functions to parent component
+  useEffect(() => {
+    setMoveLeft(() => moveLeft);
+    setMoveRight(() => moveRight);
+  }, [currentLane, setMoveLeft, setMoveRight]);
+
   // Set up keyboard controls
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -89,22 +114,6 @@ const GameScene: React.FC<GameSceneProps> = ({
       setTimeout(() => onGameOver(), 500); // Small delay before game over
     }
   }, [lives, onGameOver]);
-
-  // Move player left
-  const moveLeft = () => {
-    if (currentLane > 0 && !movingRef.current) {
-      movingRef.current = true;
-      setCurrentLane(currentLane - 1);
-    }
-  };
-
-  // Move player right
-  const moveRight = () => {
-    if (currentLane < lanes.length - 1 && !movingRef.current) {
-      movingRef.current = true;
-      setCurrentLane(currentLane + 1);
-    }
-  };
 
   // Spawn new objects
   const spawnObject = () => {
