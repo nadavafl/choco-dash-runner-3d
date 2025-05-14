@@ -88,7 +88,6 @@ const GameContainer: React.FC = () => {
     if (!musicInitialized && initAudioRef.current) {
       initAudioRef.current();
       setMusicInitialized(true);
-      setIsMusicEnabled(true);
     }
   };
 
@@ -109,6 +108,33 @@ const GameContainer: React.FC = () => {
   const handleHitObstacle = () => {
     setLives(prevLives => prevLives - 1);
   };
+
+  // Attempt to initialize music when any user interaction occurs
+  useEffect(() => {
+    const initMusic = () => {
+      if (!musicInitialized && initAudioRef.current) {
+        console.log("Initializing music from user interaction");
+        initAudioRef.current();
+        setMusicInitialized(true);
+        
+        // Remove listeners after initialization
+        window.removeEventListener('click', initMusic);
+        window.removeEventListener('keydown', initMusic);
+        window.removeEventListener('touchstart', initMusic);
+      }
+    };
+    
+    // Add listeners for user interaction
+    window.addEventListener('click', initMusic);
+    window.addEventListener('keydown', initMusic);
+    window.addEventListener('touchstart', initMusic);
+    
+    return () => {
+      window.removeEventListener('click', initMusic);
+      window.removeEventListener('keydown', initMusic);
+      window.removeEventListener('touchstart', initMusic);
+    };
+  }, [musicInitialized]);
 
   const toggleMusic = () => {
     // Toggle music state

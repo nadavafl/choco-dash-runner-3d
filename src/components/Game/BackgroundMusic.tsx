@@ -30,8 +30,6 @@ const BackgroundMusic = ({ url, volume = 0.5, playing = true, onInit }: Backgrou
       audioElement.volume = volume;
       audioRef.current = audioElement;
       
-      // Don't auto-play; wait for user interaction
-      
       // Cleanup function
       return () => {
         if (audioRef.current) {
@@ -51,6 +49,8 @@ const BackgroundMusic = ({ url, volume = 0.5, playing = true, onInit }: Backgrou
   useEffect(() => {
     if (!audioRef.current || !audioInitialized) return;
     
+    console.log("Music playing state change:", playing);
+    
     // Only play/pause if audio has been initialized through user interaction
     if (playing) {
       const playPromise = audioRef.current.play();
@@ -68,11 +68,13 @@ const BackgroundMusic = ({ url, volume = 0.5, playing = true, onInit }: Backgrou
   // Method to initialize audio after user interaction
   const initializeAudio = () => {
     if (audioRef.current && !audioInitialized) {
+      console.log("Audio initializing...");
       setAudioInitialized(true);
       if (playing) {
+        console.log("Attempting to play audio on initialization");
         audioRef.current.play()
           .then(() => {
-            console.log("Audio successfully initialized");
+            console.log("Audio successfully initialized and playing");
           })
           .catch(error => {
             console.error("Audio initialization failed:", error);
