@@ -34,7 +34,7 @@ const GameScene: React.FC<GameSceneProps> = ({
   setMoveLeft,
   setMoveRight
 }) => {
-  const speedRef = useRef(30);
+  const speedRef = useRef(15);
   const playerRef = useRef<THREE.Group>(null);
   const [playerPosition, setPlayerPosition] = useState<THREE.Vector3>(new THREE.Vector3(0, 0.5, 0));
   const [gameObjects, setGameObjects] = useState<GameObject[]>([]);
@@ -239,7 +239,7 @@ const GameScene: React.FC<GameSceneProps> = ({
     if (!gameActiveRef.current) return;
     
     // Increase game speed over time (slightly faster acceleration)
-    speedRef.current = Math.min(60, speedRef.current + delta * 0.35); // Increased max speed and acceleration
+    speedRef.current = Math.min(60, speedRef.current + delta * 0.25); // Increased max speed and acceleration
     
     // Update player position - smooth lane transition
     const targetX = lanes[currentLane];
