@@ -21,7 +21,8 @@ export function useIsMobile() {
       setIsMobile(isMobileDevice)
       console.log("Device detected as:", isMobileDevice ? "mobile" : "desktop", 
                   "Width:", window.innerWidth, 
-                  "Touch capable:", hasTouchCapability)
+                  "Touch capable:", hasTouchCapability,
+                  "User agent:", navigator.userAgent)
     }
 
     // Check initially

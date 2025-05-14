@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { Canvas } from '@react-three/fiber';
 import GameScene from './GameScene';
@@ -152,12 +151,13 @@ const GameContainer: React.FC = () => {
   };
 
   // Extract the music toggle button to a separate constant to be used across all screens
+  // Updated positioning and z-index to ensure visibility on mobile devices
   const MusicToggleButton = () => (
-    <div className="absolute top-4 right-4 z-50">
+    <div className="fixed top-4 right-4 z-[100]">
       <Button 
         variant="outline" 
         size="icon" 
-        className="bg-gray-800 bg-opacity-50 hover:bg-gray-700"
+        className="bg-gray-800 bg-opacity-70 hover:bg-gray-700 shadow-md"
         onClick={toggleMusic}
       >
         {isMusicEnabled ? (
@@ -171,7 +171,7 @@ const GameContainer: React.FC = () => {
 
   // Render canvas only when playing to avoid memory issues during transitions
   return (
-    <div className="w-full h-screen relative">
+    <div className="w-full h-screen relative overflow-hidden">
       {/* Background Music - plays on all screens */}
       <BackgroundMusic
         url="/sounds/best-game-console-301284.mp3"
