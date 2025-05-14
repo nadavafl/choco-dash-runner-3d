@@ -28,8 +28,10 @@ const TouchControls: React.FC<TouchControlsProps> = ({ onSwipeLeft, onSwipeRight
       if (Math.abs(swipeDistance) < swipeThreshold) return; // Not a significant swipe
       
       if (swipeDistance > 0) {
+        console.log('Swipe right detected');
         onSwipeRight(); // Swipe right
-      } else {
+      } else if (swipeDistance < 0) {
+        console.log('Swipe left detected');
         onSwipeLeft(); // Swipe left
       }
     };
@@ -45,7 +47,12 @@ const TouchControls: React.FC<TouchControlsProps> = ({ onSwipeLeft, onSwipeRight
     };
   }, [onSwipeLeft, onSwipeRight]);
   
-  return null; // This component doesn't render anything visible
+  return (
+    <div 
+      className="absolute inset-0 z-10 touch-none" 
+      style={{ pointerEvents: 'none' }}
+    />
+  );
 };
 
 export default TouchControls;
