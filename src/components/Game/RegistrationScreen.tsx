@@ -80,7 +80,7 @@ const RegistrationScreen: React.FC<RegistrationScreenProps> = ({
       <Card className="w-[350px] bg-game-dark border-game-primary">
         <CardHeader>
           <CardTitle className="text-3xl font-bold text-center text-game-primary">
-            CHOCO DASH
+            CHOCO DODGE
           </CardTitle>
           <CardDescription className="text-center text-game-light">
             Please register to play the game
@@ -88,7 +88,10 @@ const RegistrationScreen: React.FC<RegistrationScreenProps> = ({
         </CardHeader>
         <CardContent>
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(handleRegistration)} className="space-y-4">
+            <form
+              onSubmit={form.handleSubmit(handleRegistration)}
+              className="space-y-4"
+            >
               <FormField
                 control={form.control}
                 name="username"
@@ -100,9 +103,9 @@ const RegistrationScreen: React.FC<RegistrationScreenProps> = ({
                         <div className="bg-game-accent p-2">
                           <User className="h-5 w-5 text-black" />
                         </div>
-                        <Input 
-                          placeholder="Enter username" 
-                          className="border-0 focus-visible:ring-0 bg-transparent text-white" 
+                        <Input
+                          placeholder="Enter username"
+                          className="border-0 focus-visible:ring-0 bg-transparent text-white"
                           {...field}
                         />
                       </div>
@@ -118,7 +121,7 @@ const RegistrationScreen: React.FC<RegistrationScreenProps> = ({
                   className="w-full bg-game-primary hover:bg-game-secondary text-white flex items-center justify-center gap-2"
                 >
                   <Rocket className="h-5 w-5" />
-                  {isSubmitting ? "REGISTERING..." : "START GAME"}
+                  REGISTERING
                 </Button>
               </CardFooter>
             </form>

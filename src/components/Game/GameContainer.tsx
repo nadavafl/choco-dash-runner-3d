@@ -126,13 +126,6 @@ const GameContainer: React.FC = () => {
           username={username} 
         />
       )}
-
-      {/* Enhanced touch controls instructions for mobile devices */}
-      {/* {isMobile && gameState === 'playing' && (
-        <div className="fixed bottom-10 left-0 right-0 text-center text-white text-xl bg-black bg-opacity-80 py-4 z-50 mx-auto pointer-events-none animate-pulse-glow">
-          Swipe left or right to move
-        </div>
-      )} */}
       
     </div>
   );

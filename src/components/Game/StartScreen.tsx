@@ -33,23 +33,18 @@ const StartScreen: React.FC<StartScreenProps> = ({ onStartGame, highScore }) => 
       <Card className="w-[350px] bg-game-dark border-game-primary">
         <CardHeader>
           <CardTitle className="text-3xl font-bold text-center text-game-primary">
-            CHOCO DASH
+            CHOCO DODGE
           </CardTitle>
           <CardDescription className="text-center text-game-light">
-            Dodge chocolate, collect syringes, set high scores!
+            Dodge chocolate, collect syringes and apples, set high scores!
           </CardDescription>
         </CardHeader>
-        
-        {/* Enhanced touch controls instructions for mobile devices */}
-        {isMobile  && (
-          <div className="fixed bottom-10 left-0 right-0 text-center text-white text-xl bg-black bg-opacity-80 py-4 z-50 mx-auto pointer-events-none animate-pulse-glow">
-            Swipe left or right to move
-          </div>
-        )}
         <CardContent className="text-center space-y-4">
           <div className="my-4 flex flex-col items-center">
-            <p className="text-game-light mb-2">Controls:</p>
-            <p className="text-gray-300">← → Arrow Keys or A/D to move</p>
+            <p className="text-game-light mb-2">keyboard controls:</p>
+            <p className="text-gray-300 mb-2">← → Arrow Keys or A/D to move</p>
+            <p className="text-gray-300 mb-2">Touch screen controls:</p>
+            <p className="text-gray-300">Swipe left or right to move</p>
           </div>
 
           <div className="flex items-center justify-center gap-2 text-lg">
