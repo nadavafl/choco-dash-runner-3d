@@ -115,7 +115,7 @@ const GameScene: React.FC<GameSceneProps> = ({
     }
   }, [lives, onGameOver]);
 
-  // Spawn new objects
+  // Spawn new objects - Updated for increased difficulty
   const spawnObject = () => {
     if (!gameActiveRef.current) return;
     
@@ -133,14 +133,19 @@ const GameScene: React.FC<GameSceneProps> = ({
     // Determine how many objects to spawn in this row (increased chance of 2 objects)
     let objectsToSpawn = 1;
     
-    // 60% chance to spawn 2 objects (increased from previous percentage)
-    if (Math.random() < 0.6 && usedLanes.length < 2) {
+    // 75% chance to spawn 2 objects (increased from 60%)
+    if (Math.random() < 0.75 && usedLanes.length < 2) {
       objectsToSpawn = 2;
     }
     
+    // 15% chance to spawn 3 objects (all lanes) - new higher difficulty
+    if (Math.random() < 0.15 && usedLanes.length === 0) {
+      objectsToSpawn = 3;
+    }
+    
     for (let i = 0; i < objectsToSpawn; i++) {
-      // If we already have 2 objects in this row, don't spawn more
-      if (usedLanes.length >= 2) break;
+      // If we already have all lanes filled in this row, don't spawn more
+      if (usedLanes.length >= lanes.length) break;
       
       // Get available lanes to spawn in
       const availableLanes = lanes
@@ -153,19 +158,19 @@ const GameScene: React.FC<GameSceneProps> = ({
       const laneIndex = availableLanes[Math.floor(Math.random() * availableLanes.length)];
       usedLanes.push(laneIndex); // Mark this lane as used
       
-      // Determine what kind of object to spawn
+      // Determine what kind of object to spawn - Adjusted probabilities
       const random = Math.random();
       let type: 'obstacle' | 'syringe' | 'apple';
       
-      if (random < 0.6) {
-        type = 'obstacle'; // 60% chance for obstacle
+      if (random < 0.65) {
+        type = 'obstacle'; // 65% chance for obstacle (increased from 60%)
       } else if (random < 0.9) {
-        type = 'apple';   // 30% chance for apple (increased from 25%)
+        type = 'apple';   // 25% chance for apple (reduced from 30%)
       } else {
-        type = 'syringe'; // 10% chance for syringe (reduced from 15%)
+        type = 'syringe'; // 10% chance for syringe (kept the same)
       }
       
-      // Create a simple serializable object (no functions, DOM nodes, or circular references)
+      // Create a simple serializable object
       const newObject: GameObject = {
         id: nextObjectId.current++,
         position: new THREE.Vector3(
@@ -233,8 +238,8 @@ const GameScene: React.FC<GameSceneProps> = ({
   useFrame((_, delta) => {
     if (!gameActiveRef.current) return;
     
-    // Increase game speed over time
-    speedRef.current = Math.min(50, speedRef.current + delta * 0.3);
+    // Increase game speed over time (slightly faster acceleration)
+    speedRef.current = Math.min(55, speedRef.current + delta * 0.35); // Increased max speed and acceleration
     
     // Update player position - smooth lane transition
     const targetX = lanes[currentLane];
@@ -262,11 +267,11 @@ const GameScene: React.FC<GameSceneProps> = ({
     gameObjectsRef.current = updatedObjects;
     setGameObjects([...updatedObjects]);
     
-    // Spawn new objects - Slightly increased spawn rate
+    // Spawn new objects - Increased spawn rate by 30%
     spawnTimerRef.current -= delta;
     if (spawnTimerRef.current <= 0) {
       spawnObject();
-      spawnTimerRef.current = 0.4 + Math.random() * 1.2; // Reduced from 0.5-2 to 0.4-1.6 seconds
+      spawnTimerRef.current = 0.3 + Math.random() * 1.0; // Reduced from 0.4-1.6 to 0.3-1.3 seconds
     }
     
     // Check collisions

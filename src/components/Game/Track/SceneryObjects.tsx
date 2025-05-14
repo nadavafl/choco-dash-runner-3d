@@ -1,3 +1,4 @@
+
 import React, { Suspense, useRef } from "react";
 import * as THREE from "three";
 import { useFrame } from "@react-three/fiber";
@@ -32,8 +33,8 @@ useGLTF.preload("/models/palm_trees_draco.glb");
 const SceneryObjects: React.FC<SceneryObjectsProps> = ({ speed }) => {
   const treeRef = useRef<THREE.Mesh>(null); // 🔁 קבוצה שנזיזה בפריים
 
-  // 🪨 Rocks in the water (right side)
-  const rocks = Array(0)
+  // 🪨 Rocks in the water (right side) - Increased by 30%
+  const rocks = Array(7)
     .fill(0)
     .map((_, i) => ({
       id: i + 1000,
@@ -55,8 +56,8 @@ const SceneryObjects: React.FC<SceneryObjectsProps> = ({ speed }) => {
       color: Math.random() > 0.5 ? "#7a7572" : "#5c5957",
     }));
 
-  // 🌴 Palm trees - now using 3D model
-  const palmTrees = Array(0)
+  // 🌴 Palm trees - now using 3D model - Increased by 30%
+  const palmTrees = Array(9)
     .fill(0)
     .map((_, i) => ({
       id: i + 2000,
@@ -69,8 +70,8 @@ const SceneryObjects: React.FC<SceneryObjectsProps> = ({ speed }) => {
       leanAngle: Math.random() * 0.3 - 0.15,
     }));
 
-  // 🐚 Seashells on beach (disabled)
-  const seashells = Array(0)
+  // 🐚 Seashells on beach - Increased by 30%
+  const seashells = Array(7)
     .fill(0)
     .map((_, i) => {
       const rightSide = Math.random() > 0.5;
@@ -97,7 +98,6 @@ const SceneryObjects: React.FC<SceneryObjectsProps> = ({ speed }) => {
         treeRef.current &&
         treeRef.current.material instanceof THREE.MeshStandardMaterial
       ) {
-        console.log("I am here");
         if (treeRef.current.material.map) {
           treeRef.current.material.map.offset.y -= delta * speed * 0.001;
         }
