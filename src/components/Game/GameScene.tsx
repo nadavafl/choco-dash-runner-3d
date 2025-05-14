@@ -115,11 +115,11 @@ const GameScene: React.FC<GameSceneProps> = ({
     }
   }, [lives, onGameOver]);
 
-  // Spawn new objects - Updated for increased difficulty
+  // Spawn new objects - Updated to prevent 3 of the same type in a row
   const spawnObject = () => {
     if (!gameActiveRef.current) return;
     
-    // Collect all used lanes so we don't spawn more than 2 objects in a row
+    // Collect all used lanes so we don't spawn too many objects in a row
     const usedLanes: number[] = [];
     const objectsInRow = gameObjectsRef.current.filter(obj => 
       obj.position.z < -95 && obj.position.z > -105
@@ -130,18 +130,28 @@ const GameScene: React.FC<GameSceneProps> = ({
       if (laneIndex >= 0) usedLanes.push(laneIndex);
     });
     
-    // Determine how many objects to spawn in this row (increased chance of 2 objects)
+    // Determine how many objects to spawn in this row
     let objectsToSpawn = 1;
     
-    // 75% chance to spawn 2 objects (increased from 60%)
+    // 75% chance to spawn 2 objects
     if (Math.random() < 0.75 && usedLanes.length < 2) {
       objectsToSpawn = 2;
     }
     
-    // 15% chance to spawn 3 objects (all lanes) - new higher difficulty
-    if (Math.random() < 0.15 && usedLanes.length === 0) {
-      objectsToSpawn = 3;
-    }
+    // MODIFIED: Removed the chance to spawn 3 objects to prevent having all 3 lanes filled
+    // This ensures we never have 3 of the same obstacle type in a row
+    
+    // Count object types to prevent having all 3 of the same type
+    const objectTypes = {
+      obstacle: 0,
+      syringe: 0,
+      apple: 0
+    };
+    
+    // Count existing objects in this row by type
+    objectsInRow.forEach(obj => {
+      objectTypes[obj.type]++;
+    });
     
     for (let i = 0; i < objectsToSpawn; i++) {
       // If we already have all lanes filled in this row, don't spawn more
@@ -158,17 +168,33 @@ const GameScene: React.FC<GameSceneProps> = ({
       const laneIndex = availableLanes[Math.floor(Math.random() * availableLanes.length)];
       usedLanes.push(laneIndex); // Mark this lane as used
       
-      // Determine what kind of object to spawn - Adjusted probabilities
-      const random = Math.random();
+      // Determine what kind of object to spawn
       let type: 'obstacle' | 'syringe' | 'apple';
       
-      if (random < 0.65) {
-        type = 'obstacle'; // 65% chance for obstacle (increased from 60%)
-      } else if (random < 0.9) {
-        type = 'apple';   // 25% chance for apple (reduced from 30%)
+      // MODIFIED: Prevent spawning more of a type if we already have 2 of that type
+      if (objectTypes.obstacle >= 2) {
+        // Don't spawn more obstacles, choose between apple and syringe
+        type = Math.random() < 0.7 ? 'apple' : 'syringe';
+      } else if (objectTypes.apple >= 2) {
+        // Don't spawn more apples, choose between obstacle and syringe
+        type = Math.random() < 0.8 ? 'obstacle' : 'syringe';
+      } else if (objectTypes.syringe >= 2) {
+        // Don't spawn more syringes, choose between obstacle and apple
+        type = Math.random() < 0.7 ? 'obstacle' : 'apple';
       } else {
-        type = 'syringe'; // 10% chance for syringe (kept the same)
+        // Normal probability distribution
+        const random = Math.random();
+        if (random < 0.65) {
+          type = 'obstacle'; // 65% chance for obstacle
+        } else if (random < 0.9) {
+          type = 'apple';   // 25% chance for apple
+        } else {
+          type = 'syringe'; // 10% chance for syringe
+        }
       }
+      
+      // Increment the count for this type
+      objectTypes[type]++;
       
       // Create a simple serializable object
       const newObject: GameObject = {
