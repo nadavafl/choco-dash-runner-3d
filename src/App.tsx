@@ -17,14 +17,14 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
-      <ErrorBoundary>
+      {/* <ErrorBoundary> */}
         <Routes>
           <Route path="/" element={<Index />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
           </Routes>
-          </ErrorBoundary>
-          <DebugLog />
+          {/* </ErrorBoundary> */}
+          {/* <DebugLog /> */}
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
