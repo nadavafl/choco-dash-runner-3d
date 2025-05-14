@@ -1,3 +1,4 @@
+
 import React, { forwardRef } from "react";
 import { useGLTF } from "@react-three/drei";
 import * as THREE from "three";
@@ -8,7 +9,8 @@ interface PlayerProps {
 }
 
 const Player = forwardRef<THREE.Group, PlayerProps>(({ position }, ref) => {
-  const { scene } = useGLTF("/models/low_poly_scooter_draco.glb");
+  // Using a slightly different path to force a new request and bypass caching
+  const { scene } = useGLTF("/models/low_poly_scooter_draco.glb?v=2");
 
   // Adjusted position to be on top of the bridge
   const adjustedPosition = new THREE.Vector3(
@@ -39,11 +41,13 @@ const Player = forwardRef<THREE.Group, PlayerProps>(({ position }, ref) => {
       castShadow
       receiveShadow
     >
-      {/* Player Body - Explorer outfit */}
-      {/* Note: replaced old mesh with GLTF bunny model */}
+      {/* Player model - Using scooter model */}
       <primitive object={scene} />
     </group>
   );
 });
+
+// Add preload for the model to ensure it's available
+useGLTF.preload("/models/low_poly_scooter_draco.glb?v=2");
 
 export default Player;

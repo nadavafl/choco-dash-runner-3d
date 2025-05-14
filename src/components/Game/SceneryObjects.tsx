@@ -1,3 +1,4 @@
+
 import React, { Suspense, useRef } from "react";
 import * as THREE from "three";
 import { useFrame } from "@react-three/fiber";
@@ -26,7 +27,7 @@ const PalmTreeModel: React.FC<{
   );
 };
 
-// Ensure the palm tree model is preloaded
+// Preload palm tree model
 useGLTF.preload("/models/palm_trees_draco.glb");
 
 const SceneryObjects: React.FC<SceneryObjectsProps> = ({ speed }) => {
@@ -93,16 +94,15 @@ const SceneryObjects: React.FC<SceneryObjectsProps> = ({ speed }) => {
 
   // ⏱ תנועה איטית של הדקלים לאורך z
   useFrame((_, delta) => {
-      if (
-        treeRef.current &&
-        treeRef.current.material instanceof THREE.MeshStandardMaterial
-      ) {
-        console.log("I am here");
-        if (treeRef.current.material.map) {
-          treeRef.current.material.map.offset.y -= delta * speed * 0.001;
-        }
+    if (
+      treeRef.current &&
+      treeRef.current.material instanceof THREE.MeshStandardMaterial
+    ) {
+      if (treeRef.current.material.map) {
+        treeRef.current.material.map.offset.y -= delta * speed * 0.001;
       }
-    });
+    }
+  });
 
   return (
     <Suspense fallback={null}>
