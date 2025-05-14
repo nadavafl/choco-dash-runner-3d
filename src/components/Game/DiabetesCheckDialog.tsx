@@ -119,7 +119,7 @@ const DiabetesCheckDialog: React.FC<DiabetesCheckDialogProps> = ({
 
   return (
     <Dialog open={open}>
-      <DialogContent className="max-w-md">
+      <DialogContent className="max-w-md [&>button:last-child]:hidden">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-xl">
             <Syringe className="h-6 w-6 text-game-primary" />
@@ -151,16 +151,46 @@ const DiabetesCheckDialog: React.FC<DiabetesCheckDialogProps> = ({
             />
 
             {feedbackMessage.type && (
-              <Alert className={`
-                ${feedbackMessage.type === "low" ? "bg-[#FEC6A1] border-orange-400" : ""} 
-                ${feedbackMessage.type === "normal" ? "bg-[#F2FCE2] border-green-400" : ""}
-                ${feedbackMessage.type === "high" ? "bg-[#ea384c] text-white border-red-600" : ""}
-              `}>
-                <AlertTriangle className={`h-4 w-4 ${feedbackMessage.type === "high" ? "text-white" : ""}`} />
-                <AlertTitle className={`${feedbackMessage.type === "high" ? "text-white" : "text-[#403E43]"}`}>
+              <Alert
+                className={`
+                ${
+                  feedbackMessage.type === "low"
+                    ? "bg-[#FEC6A1] border-orange-400"
+                    : ""
+                } 
+                ${
+                  feedbackMessage.type === "normal"
+                    ? "bg-[#F2FCE2] border-green-400"
+                    : ""
+                }
+                ${
+                  feedbackMessage.type === "high"
+                    ? "bg-[#ea384c] text-white border-red-600"
+                    : ""
+                }
+              `}
+              >
+                <AlertTriangle
+                  className={`h-4 w-4 ${
+                    feedbackMessage.type === "high" ? "text-white" : ""
+                  }`}
+                />
+                <AlertTitle
+                  className={`${
+                    feedbackMessage.type === "high"
+                      ? "text-white"
+                      : "text-[#403E43]"
+                  }`}
+                >
                   Blood Glucose Alert
                 </AlertTitle>
-                <AlertDescription className={`${feedbackMessage.type === "high" ? "text-white" : "text-[#403E43]"}`}>
+                <AlertDescription
+                  className={`${
+                    feedbackMessage.type === "high"
+                      ? "text-white"
+                      : "text-[#403E43]"
+                  }`}
+                >
                   {feedbackMessage.message}
                 </AlertDescription>
               </Alert>
