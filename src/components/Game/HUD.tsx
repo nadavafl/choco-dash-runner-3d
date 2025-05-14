@@ -95,7 +95,7 @@ const HUD: React.FC<HUDProps> = ({ score, highScore, lives }) => {
   return (
     <>
       {/* 🟢 דסקטופ: שלושתם בשורה למעלה */}
-      <div className="hidden md:flex absolute top-0 left-0 right-0 px-4 py-3 justify-between items-center z-50">
+      <div className="hidden md:flex absolute top-3 left-0 right-0 px-4 py-3 justify-between items-center z-50">
         {/* Score */}
         <Badge
           variant="outline"
