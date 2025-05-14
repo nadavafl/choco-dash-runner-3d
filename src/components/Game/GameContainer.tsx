@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { Canvas } from '@react-three/fiber';
 import GameScene from './GameScene';
@@ -25,6 +24,7 @@ const GameContainer: React.FC = () => {
   const [isMusicEnabled, setIsMusicEnabled] = useState(false);
   const [musicInitialized, setMusicInitialized] = useState(false);
   const backgroundMusicRef = useRef<any>(null);
+  const initAudioRef = useRef<(() => void) | null>(null);
   
   // Player movement controls - referenced by TouchControls
   const [moveLeft, setMoveLeft] = useState<() => void>(() => () => {});
@@ -84,8 +84,8 @@ const GameContainer: React.FC = () => {
     }, 50); // Small delay to ensure clean transitions
     
     // Initialize music on first user interaction
-    if (!musicInitialized && backgroundMusicRef.current) {
-      backgroundMusicRef.current.initializeAudio();
+    if (!musicInitialized && initAudioRef.current) {
+      initAudioRef.current();
       setMusicInitialized(true);
       setIsMusicEnabled(true);
     }
@@ -114,21 +114,26 @@ const GameContainer: React.FC = () => {
     setIsMusicEnabled(!isMusicEnabled);
     
     // Initialize if first time
-    if (!musicInitialized && backgroundMusicRef.current) {
-      backgroundMusicRef.current.initializeAudio();
+    if (!musicInitialized && initAudioRef.current) {
+      initAudioRef.current();
       setMusicInitialized(true);
     }
+  };
+
+  const handleMusicInit = (initFn: () => void) => {
+    initAudioRef.current = initFn;
   };
 
   // Render canvas only when playing to avoid memory issues during transitions
   return (
     <div className="w-full h-screen relative">
       {/* Background Music - plays on all screens */}
-      {backgroundMusicRef.current = BackgroundMusic({
-        url: "/sounds/best-game-console-301284.mp3",
-        playing: isMusicEnabled,
-        volume: 0.4,
-      })}
+      <BackgroundMusic
+        url="/sounds/best-game-console-301284.mp3"
+        playing={isMusicEnabled}
+        volume={0.4}
+        onInit={handleMusicInit}
+      />
 
       {/* Music toggle button */}
       <div className="absolute top-4 right-4 z-50">

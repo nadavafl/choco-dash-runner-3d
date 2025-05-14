@@ -5,6 +5,7 @@ interface BackgroundMusicProps {
   url: string;
   volume?: number;
   playing?: boolean;
+  onInit?: (initFn: () => void) => void;
 }
 
 /**
@@ -15,8 +16,9 @@ interface BackgroundMusicProps {
  * @param url Path to the audio file (e.g. "/sounds/background-music.mp3")
  * @param volume Volume level from 0 to 1 (default: 0.5)
  * @param playing Whether the music should be playing (default: true)
+ * @param onInit Callback that provides the initialize function
  */
-const BackgroundMusic = ({ url, volume = 0.5, playing = true }: BackgroundMusicProps) => {
+const BackgroundMusic = ({ url, volume = 0.5, playing = true, onInit }: BackgroundMusicProps) => {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [audioInitialized, setAudioInitialized] = useState(false);
 
@@ -79,9 +81,15 @@ const BackgroundMusic = ({ url, volume = 0.5, playing = true }: BackgroundMusicP
     }
   };
 
+  // Provide the initialization function through the callback
+  useEffect(() => {
+    if (onInit) {
+      onInit(initializeAudio);
+    }
+  }, [onInit]);
+
   // This component doesn't render anything visible
-  // But exposes initializeAudio method
-  return { initializeAudio };
+  return null;
 };
 
 export default BackgroundMusic;
