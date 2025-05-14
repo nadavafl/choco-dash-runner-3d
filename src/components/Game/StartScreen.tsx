@@ -3,6 +3,7 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Trophy, Rocket } from 'lucide-react';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 interface StartScreenProps {
   onStartGame: () => void;
@@ -10,6 +11,7 @@ interface StartScreenProps {
 }
 
 const StartScreen: React.FC<StartScreenProps> = ({ onStartGame, highScore }) => {
+  const isMobile = useIsMobile();
   // Handle start game with safer approach to prevent clone errors
   const handleStartGame = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -37,6 +39,13 @@ const StartScreen: React.FC<StartScreenProps> = ({ onStartGame, highScore }) => 
             Dodge chocolate, collect syringes, set high scores!
           </CardDescription>
         </CardHeader>
+        
+        {/* Enhanced touch controls instructions for mobile devices */}
+        {isMobile  && (
+          <div className="fixed bottom-10 left-0 right-0 text-center text-white text-xl bg-black bg-opacity-80 py-4 z-50 mx-auto pointer-events-none animate-pulse-glow">
+            Swipe left or right to move
+          </div>
+        )}
         <CardContent className="text-center space-y-4">
           <div className="my-4 flex flex-col items-center">
             <p className="text-game-light mb-2">Controls:</p>
@@ -49,8 +58,8 @@ const StartScreen: React.FC<StartScreenProps> = ({ onStartGame, highScore }) => 
           </div>
         </CardContent>
         <CardFooter>
-          <Button 
-            onClick={handleStartGame} 
+          <Button
+            onClick={handleStartGame}
             className="w-full bg-game-primary hover:bg-game-secondary text-white flex items-center justify-center gap-2"
           >
             <Rocket className="h-5 w-5" />
