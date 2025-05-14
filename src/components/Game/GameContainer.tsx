@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import { Canvas } from '@react-three/fiber';
 import GameScene from './GameScene';
@@ -8,6 +9,8 @@ import RegistrationScreen from './RegistrationScreen';
 import TouchControls from './TouchControls';
 import BackgroundMusic from './BackgroundMusic';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { Button } from '@/components/ui/button';
+import { Volume2, VolumeX } from 'lucide-react';
 
 const GameContainer: React.FC = () => {
   const [gameState, setGameState] = useState<'register' | 'start' | 'playing' | 'gameover'>('register');
@@ -19,7 +22,9 @@ const GameContainer: React.FC = () => {
   const livesRef = useRef(3);
   const isMobile = useIsMobile();
   const gameStateRef = useRef<'register' | 'start' | 'playing' | 'gameover'>('register');
-  const [isMusicEnabled, setIsMusicEnabled] = useState(true);
+  const [isMusicEnabled, setIsMusicEnabled] = useState(false);
+  const [musicInitialized, setMusicInitialized] = useState(false);
+  const backgroundMusicRef = useRef<any>(null);
   
   // Player movement controls - referenced by TouchControls
   const [moveLeft, setMoveLeft] = useState<() => void>(() => () => {});
@@ -77,6 +82,13 @@ const GameContainer: React.FC = () => {
       setGameState('playing');
       console.log("Game state changed to playing");
     }, 50); // Small delay to ensure clean transitions
+    
+    // Initialize music on first user interaction
+    if (!musicInitialized && backgroundMusicRef.current) {
+      backgroundMusicRef.current.initializeAudio();
+      setMusicInitialized(true);
+      setIsMusicEnabled(true);
+    }
   };
 
   const handleGameOver = () => {
@@ -97,15 +109,42 @@ const GameContainer: React.FC = () => {
     setLives(prevLives => prevLives - 1);
   };
 
+  const toggleMusic = () => {
+    // Toggle music state
+    setIsMusicEnabled(!isMusicEnabled);
+    
+    // Initialize if first time
+    if (!musicInitialized && backgroundMusicRef.current) {
+      backgroundMusicRef.current.initializeAudio();
+      setMusicInitialized(true);
+    }
+  };
+
   // Render canvas only when playing to avoid memory issues during transitions
   return (
     <div className="w-full h-screen relative">
       {/* Background Music - plays on all screens */}
-      <BackgroundMusic
-        url="/sounds/best-game-console-301284.mp3"
-        playing={isMusicEnabled}
-        volume={0.4}
-      />
+      {backgroundMusicRef.current = BackgroundMusic({
+        url: "/sounds/best-game-console-301284.mp3",
+        playing: isMusicEnabled,
+        volume: 0.4,
+      })}
+
+      {/* Music toggle button */}
+      <div className="absolute top-4 right-4 z-50">
+        <Button 
+          variant="outline" 
+          size="icon" 
+          className="bg-gray-800 bg-opacity-50 hover:bg-gray-700"
+          onClick={toggleMusic}
+        >
+          {isMusicEnabled ? (
+            <Volume2 className="h-4 w-4 text-white" />
+          ) : (
+            <VolumeX className="h-4 w-4 text-white" />
+          )}
+        </Button>
+      </div>
 
       {gameState === "playing" && (
         <Canvas shadows camera={{ position: [0, 5, 10], fov: 70 }}>

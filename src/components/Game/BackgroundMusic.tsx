@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 interface BackgroundMusicProps {
   url: string;
@@ -17,50 +17,71 @@ interface BackgroundMusicProps {
  * @param playing Whether the music should be playing (default: true)
  */
 const BackgroundMusic = ({ url, volume = 0.5, playing = true }: BackgroundMusicProps) => {
-  const [audio] = useState<HTMLAudioElement | null>(() => {
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const [audioInitialized, setAudioInitialized] = useState(false);
+
+  useEffect(() => {
     // Create audio element when component mounts
     if (typeof window !== 'undefined') {
       const audioElement = new Audio(url);
       audioElement.loop = true;
       audioElement.volume = volume;
-      return audioElement;
+      audioRef.current = audioElement;
+      
+      // Don't auto-play; wait for user interaction
+      
+      // Cleanup function
+      return () => {
+        if (audioRef.current) {
+          audioRef.current.pause();
+        }
+      };
     }
-    return null;
-  });
+  }, [url]);
 
   useEffect(() => {
-    if (!audio) return;
+    if (!audioRef.current) return;
     
     // Update volume when prop changes
-    audio.volume = volume;
-  }, [audio, volume]);
+    audioRef.current.volume = volume;
+  }, [volume]);
 
   useEffect(() => {
-    if (!audio) return;
+    if (!audioRef.current || !audioInitialized) return;
     
-    // Play or pause based on playing prop
+    // Only play/pause if audio has been initialized through user interaction
     if (playing) {
-      // Using a Promise with catch to handle autoplay restrictions
-      const playPromise = audio.play();
+      const playPromise = audioRef.current.play();
       
       if (playPromise !== undefined) {
         playPromise.catch(error => {
           console.error("Audio playback failed:", error);
-          // Often this is due to browser autoplay restrictions
         });
       }
     } else {
-      audio.pause();
+      audioRef.current.pause();
     }
-    
-    // Cleanup function
-    return () => {
-      audio.pause();
-    };
-  }, [audio, playing]);
+  }, [playing, audioInitialized]);
+  
+  // Method to initialize audio after user interaction
+  const initializeAudio = () => {
+    if (audioRef.current && !audioInitialized) {
+      setAudioInitialized(true);
+      if (playing) {
+        audioRef.current.play()
+          .then(() => {
+            console.log("Audio successfully initialized");
+          })
+          .catch(error => {
+            console.error("Audio initialization failed:", error);
+          });
+      }
+    }
+  };
 
   // This component doesn't render anything visible
-  return null;
+  // But exposes initializeAudio method
+  return { initializeAudio };
 };
 
 export default BackgroundMusic;
