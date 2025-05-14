@@ -6,6 +6,7 @@ import GameOverScreen from './GameOverScreen';
 import StartScreen from './StartScreen';
 import RegistrationScreen from './RegistrationScreen';
 import TouchControls from './TouchControls';
+import BackgroundMusic from './BackgroundMusic';
 import { useIsMobile } from '@/hooks/use-mobile';
 
 const GameContainer: React.FC = () => {
@@ -18,6 +19,7 @@ const GameContainer: React.FC = () => {
   const livesRef = useRef(3);
   const isMobile = useIsMobile();
   const gameStateRef = useRef<'register' | 'start' | 'playing' | 'gameover'>('register');
+  const [isMusicEnabled, setIsMusicEnabled] = useState(true);
   
   // Player movement controls - referenced by TouchControls
   const [moveLeft, setMoveLeft] = useState<() => void>(() => () => {});
@@ -98,6 +100,13 @@ const GameContainer: React.FC = () => {
   // Render canvas only when playing to avoid memory issues during transitions
   return (
     <div className="w-full h-screen relative">
+      {/* Background Music - plays on all screens */}
+      <BackgroundMusic 
+        url="/sounds/background-music.mp3" 
+        playing={isMusicEnabled} 
+        volume={0.4} 
+      />
+      
       {gameState === 'playing' && (
         <Canvas shadows camera={{ position: [0, 5, 10], fov: 70 }}>
           <GameScene 
@@ -122,7 +131,13 @@ const GameContainer: React.FC = () => {
 
       {gameState === 'playing' && (
         <>
-          <HUD score={score} highScore={highScore} lives={lives} />
+          <HUD 
+            score={score} 
+            highScore={highScore} 
+            lives={lives} 
+            isMusicEnabled={isMusicEnabled}
+            onToggleMusic={() => setIsMusicEnabled(!isMusicEnabled)}
+          />
           {isMobile && <TouchControls onSwipeLeft={moveLeft} onSwipeRight={moveRight} />}
         </>
       )}
