@@ -101,15 +101,15 @@ const GameContainer: React.FC = () => {
   return (
     <div className="w-full h-screen relative">
       {/* Background Music - plays on all screens */}
-      <BackgroundMusic 
-        url="/sounds/background-music.mp3" 
-        playing={isMusicEnabled} 
-        volume={0.4} 
+      <BackgroundMusic
+        url="/sounds/best-game-console-301284.mp3"
+        playing={isMusicEnabled}
+        volume={0.4}
       />
-      
-      {gameState === 'playing' && (
+
+      {gameState === "playing" && (
         <Canvas shadows camera={{ position: [0, 5, 10], fov: 70 }}>
-          <GameScene 
+          <GameScene
             onCollectSyringe={handleCollectSyringe}
             onCollectApple={handleCollectApple}
             onHitObstacle={handleHitObstacle}
@@ -121,34 +121,33 @@ const GameContainer: React.FC = () => {
         </Canvas>
       )}
 
-      {gameState === 'register' && (
-        <RegistrationScreen onRegistrationComplete={handleRegistrationComplete} />
+      {gameState === "register" && (
+        <RegistrationScreen
+          onRegistrationComplete={handleRegistrationComplete}
+        />
       )}
 
-      {gameState === 'start' && (
+      {gameState === "start" && (
         <StartScreen onStartGame={handleStartGame} highScore={highScore} />
       )}
 
-      {gameState === 'playing' && (
+      {gameState === "playing" && (
         <>
-          <HUD 
-            score={score} 
-            highScore={highScore} 
-            lives={lives} 
-          />
-          {isMobile && <TouchControls onSwipeLeft={moveLeft} onSwipeRight={moveRight} />}
+          <HUD score={score} highScore={highScore} lives={lives} />
+          {isMobile && (
+            <TouchControls onSwipeLeft={moveLeft} onSwipeRight={moveRight} />
+          )}
         </>
       )}
 
-      {gameState === 'gameover' && (
-        <GameOverScreen 
-          score={score} 
-          highScore={highScore} 
+      {gameState === "gameover" && (
+        <GameOverScreen
+          score={score}
+          highScore={highScore}
           onRestart={handleStartGame}
-          username={username} 
+          username={username}
         />
       )}
-      
     </div>
   );
 };
