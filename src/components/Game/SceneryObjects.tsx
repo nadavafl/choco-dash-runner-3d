@@ -57,7 +57,7 @@ const SceneryObjects: React.FC<SceneryObjectsProps> = ({ speed }) => {
     }));
 
   // 🌴 Palm trees - now using 3D model
-  const palmTrees = Array(5)
+  const palmTrees = Array(0)
     .fill(0)
     .map((_, i) => ({
       id: i + 2000,
