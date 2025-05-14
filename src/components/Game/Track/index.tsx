@@ -26,6 +26,12 @@ const Track: React.FC<TrackProps> = ({ speed }) => {
       <directionalLight position={[50, 100, 20]} intensity={1.2} color="#FFF8DC" castShadow />
       <pointLight position={[30, 0, 20]} intensity={0.6} color="#33C3F0" distance={20} />
       <fog attach="fog" args={['#E6F2FF', 60, 180]} />
+      
+      {/* Shadow catcher for better grounding effect */}
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.01, 0]} receiveShadow>
+        <planeGeometry args={[20, 1000]} />
+        <shadowMaterial transparent opacity={0.4} />
+      </mesh>
     </>
   );
 };
