@@ -1,24 +1,19 @@
 
 import React from "react";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Gamepad, Trophy, Music, MusicOff } from "lucide-react";
+import { Gamepad, Trophy } from "lucide-react";
 import LivesDisplay from "./LivesDisplay";
 
 interface HUDProps {
   score: number;
   highScore: number;
   lives: number;
-  isMusicEnabled?: boolean;
-  onToggleMusic?: () => void;
 }
 
 const HUD: React.FC<HUDProps> = ({ 
   score, 
   highScore, 
-  lives,
-  isMusicEnabled = true,
-  onToggleMusic = () => {}
+  lives
 }) => {
   return (
     <>
@@ -36,19 +31,6 @@ const HUD: React.FC<HUDProps> = ({
           <div className="bg-game-dark bg-opacity-60 px-4 py-2 rounded-full">
             <LivesDisplay lives={lives} />
           </div>
-          
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={onToggleMusic}
-            className="bg-game-dark bg-opacity-60 text-white hover:bg-game-dark hover:bg-opacity-80"
-          >
-            {isMusicEnabled ? (
-              <Music className="h-5 w-5" />
-            ) : (
-              <MusicOff className="h-5 w-5" />
-            )}
-          </Button>
         </div>
 
         <Badge
@@ -77,19 +59,6 @@ const HUD: React.FC<HUDProps> = ({
               <Gamepad className="h-4 w-4" />
               <span>Score: {score}</span>
             </Badge>
-
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={onToggleMusic}
-              className="bg-game-dark bg-opacity-60 text-white hover:bg-game-dark hover:bg-opacity-80 h-8 w-8 p-1"
-            >
-              {isMusicEnabled ? (
-                <Music className="h-4 w-4" />
-              ) : (
-                <MusicOff className="h-4 w-4" />
-              )}
-            </Button>
 
             <Badge
               variant="outline"

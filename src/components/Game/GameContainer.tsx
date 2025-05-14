@@ -135,8 +135,6 @@ const GameContainer: React.FC = () => {
             score={score} 
             highScore={highScore} 
             lives={lives} 
-            isMusicEnabled={isMusicEnabled}
-            onToggleMusic={() => setIsMusicEnabled(!isMusicEnabled)}
           />
           {isMobile && <TouchControls onSwipeLeft={moveLeft} onSwipeRight={moveRight} />}
         </>
