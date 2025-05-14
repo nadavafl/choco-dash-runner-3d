@@ -239,7 +239,7 @@ const GameScene: React.FC<GameSceneProps> = ({
     if (!gameActiveRef.current) return;
     
     // Increase game speed over time (slightly faster acceleration)
-    speedRef.current = Math.min(55, speedRef.current + delta * 0.35); // Increased max speed and acceleration
+    speedRef.current = Math.min(60, speedRef.current + delta * 0.35); // Increased max speed and acceleration
     
     // Update player position - smooth lane transition
     const targetX = lanes[currentLane];
