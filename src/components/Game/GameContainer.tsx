@@ -21,7 +21,7 @@ const GameContainer: React.FC = () => {
   const livesRef = useRef(3);
   const isMobile = useIsMobile();
   const gameStateRef = useRef<'register' | 'start' | 'playing' | 'gameover'>('register');
-  const [isMusicEnabled, setIsMusicEnabled] = useState(false);
+  const [isMusicEnabled, setIsMusicEnabled] = useState(true);
   const [musicInitialized, setMusicInitialized] = useState(false);
   const backgroundMusicRef = useRef<any>(null);
   const initAudioRef = useRef<(() => void) | null>(null);
