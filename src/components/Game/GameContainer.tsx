@@ -151,6 +151,24 @@ const GameContainer: React.FC = () => {
     initAudioRef.current = initFn;
   };
 
+  // Extract the music toggle button to a separate constant to be used across all screens
+  const MusicToggleButton = () => (
+    <div className="absolute top-4 right-4 z-50">
+      <Button 
+        variant="outline" 
+        size="icon" 
+        className="bg-gray-800 bg-opacity-50 hover:bg-gray-700"
+        onClick={toggleMusic}
+      >
+        {isMusicEnabled ? (
+          <Volume2 className="h-4 w-4 text-white" />
+        ) : (
+          <VolumeX className="h-4 w-4 text-white" />
+        )}
+      </Button>
+    </div>
+  );
+
   // Render canvas only when playing to avoid memory issues during transitions
   return (
     <div className="w-full h-screen relative">
@@ -162,21 +180,8 @@ const GameContainer: React.FC = () => {
         onInit={handleMusicInit}
       />
 
-      {/* Music toggle button */}
-      <div className="absolute top-4 right-4 z-50">
-        <Button 
-          variant="outline" 
-          size="icon" 
-          className="bg-gray-800 bg-opacity-50 hover:bg-gray-700"
-          onClick={toggleMusic}
-        >
-          {isMusicEnabled ? (
-            <Volume2 className="h-4 w-4 text-white" />
-          ) : (
-            <VolumeX className="h-4 w-4 text-white" />
-          )}
-        </Button>
-      </div>
+      {/* Music toggle button - now visible on all screens */}
+      <MusicToggleButton />
 
       {gameState === "playing" && (
         <Canvas shadows camera={{ position: [0, 5, 10], fov: 70 }}>
