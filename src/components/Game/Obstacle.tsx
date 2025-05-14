@@ -1,3 +1,4 @@
+
 import React, { useRef, Suspense } from "react";
 import * as THREE from "three";
 import { useFrame } from "@react-three/fiber";
@@ -53,7 +54,7 @@ const Obstacle: React.FC<ObstacleProps> = ({ position }) => {
         ref={ref}
         position={position}
         rotation={[Math.PI / 2, Math.PI, 0]} // ⬅️ עמידה + קוביות כלפי מצלמה
-        scale={[3.5, 3.5, 3.5]} // ⬅️ הגדלה
+        scale={[3.15, 3.15, 3.15]} // ⬅️ הקטנה ב-10% (מ-3.5 ל-3.15)
         castShadow
         receiveShadow
       >
