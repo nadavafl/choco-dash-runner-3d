@@ -45,6 +45,7 @@ const StartScreen: React.FC<StartScreenProps> = ({ onStartGame, highScore }) => 
             <p className="text-gray-300 mb-2">← → Arrow Keys or A/D to move</p>
             <p className="text-gray-300 mb-2">Touch screen controls:</p>
             <p className="text-gray-300">Swipe left or right to move</p>
+            <p className="text-gray-300 mt-2">Use the music toggle in the top-right corner</p>
           </div>
 
           <div className="flex items-center justify-center gap-2 text-lg">
