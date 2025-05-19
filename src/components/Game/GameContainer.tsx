@@ -27,6 +27,7 @@ const GameContainer: React.FC = () => {
   const initAudioRef = useRef<(() => void) | null>(null);
   const [showDiabetesCheck, setShowDiabetesCheck] = useState(false);
   const diabetesCheckTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const lastMidnightCheckRef = useRef<Date>(new Date());
   
   // Player movement controls - referenced by TouchControls
   const [moveLeft, setMoveLeft] = useState<() => void>(() => () => {});
@@ -43,6 +44,12 @@ const GameContainer: React.FC = () => {
     if (savedHighScore) {
       setHighScore(parseInt(savedHighScore));
     }
+    
+    // Initialize the last midnight check date
+    const lastCheck = localStorage.getItem('lastMidnightCheck');
+    if (lastCheck) {
+      lastMidnightCheckRef.current = new Date(lastCheck);
+    }
   }, []);
 
   useEffect(() => {
@@ -55,6 +62,46 @@ const GameContainer: React.FC = () => {
     // Update scoreRef to keep it in sync with score state
     scoreRef.current = score;
   }, [score, highScore]);
+
+  // Set up midnight check for daily score reset
+  useEffect(() => {
+    const checkMidnightReset = () => {
+      const now = new Date();
+      const lastCheck = lastMidnightCheckRef.current;
+      
+      // Check if we've crossed a day boundary (midnight) since last check
+      if (now.getDate() !== lastCheck.getDate() || 
+          now.getMonth() !== lastCheck.getMonth() || 
+          now.getFullYear() !== lastCheck.getFullYear()) {
+        
+        console.log("Day changed - updating high score and resetting current score");
+        
+        // Save high score if current score is higher
+        if (scoreRef.current > highScore) {
+          setHighScore(scoreRef.current);
+          localStorage.setItem('chocoDashHighScore', scoreRef.current.toString());
+        }
+        
+        // Reset current score to 0
+        setScore(0);
+        scoreRef.current = 0;
+      }
+      
+      // Update last check time
+      lastMidnightCheckRef.current = now;
+      localStorage.setItem('lastMidnightCheck', now.toISOString());
+    };
+    
+    // Check immediately on component mount
+    checkMidnightReset();
+    
+    // Set up interval to check every minute
+    const intervalId = setInterval(checkMidnightReset, 60000);
+    
+    return () => {
+      clearInterval(intervalId);
+    };
+  }, [highScore]);
 
   // Set up diabetes check timer when the game is playing
   useEffect(() => {
