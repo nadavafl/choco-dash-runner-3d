@@ -1,16 +1,18 @@
 
 import React from "react";
 import { Badge } from "@/components/ui/badge";
-import { Gamepad, Trophy } from "lucide-react";
+import { Gamepad, Trophy, Pause } from "lucide-react";
 
 interface HUDProps {
   score: number;
   highScore: number;
+  isPaused?: boolean;
 }
 
 const HUD: React.FC<HUDProps> = ({ 
   score, 
-  highScore
+  highScore,
+  isPaused = false
 }) => {
   return (
     <>
@@ -23,6 +25,16 @@ const HUD: React.FC<HUDProps> = ({
           <Gamepad className="h-5 w-5" />
           <span>Score: {score}</span>
         </Badge>
+
+        {isPaused && (
+          <Badge
+            variant="outline"
+            className="bg-orange-500 text-white px-3 py-1 text-base flex items-center gap-2 animate-pulse"
+          >
+            <Pause className="h-5 w-5" />
+            <span>PAUSED</span>
+          </Badge>
+        )}
 
         <Badge
           variant="outline"
@@ -43,6 +55,16 @@ const HUD: React.FC<HUDProps> = ({
             <Gamepad className="h-4 w-4" />
             <span>Score: {score}</span>
           </Badge>
+
+          {isPaused && (
+            <Badge
+              variant="outline"
+              className="bg-orange-500 text-white px-3 py-1 text-sm flex items-center gap-2 animate-pulse"
+            >
+              <Pause className="h-4 w-4" />
+              <span>PAUSED</span>
+            </Badge>
+          )}
 
           <Badge
             variant="outline"

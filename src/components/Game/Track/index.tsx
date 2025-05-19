@@ -12,6 +12,8 @@ interface TrackProps {
 }
 
 const Track: React.FC<TrackProps> = ({ speed }) => {
+  const isPaused = speed === 0;
+  
   return (
     <>
       {/* Environment components */}
@@ -32,6 +34,14 @@ const Track: React.FC<TrackProps> = ({ speed }) => {
         <planeGeometry args={[20, 1000]} />
         <shadowMaterial transparent opacity={0.4} />
       </mesh>
+      
+      {/* Optional pause indicator overlay */}
+      {isPaused && (
+        <group position={[0, 5, -5]}>
+          {/* This is an invisible element that doesn't render visually 
+              but shows the game is in a paused state */}
+        </group>
+      )}
     </>
   );
 };

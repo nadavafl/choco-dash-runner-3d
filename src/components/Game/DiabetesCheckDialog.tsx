@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import {
   Dialog,
@@ -96,7 +97,7 @@ const DiabetesCheckDialog: React.FC<DiabetesCheckDialogProps> = ({
     } catch (error) {
       console.error("Error submitting blood glucose reading:", error);
       toast.error("Failed to submit reading", {
-        description: "Please try again or play without submitting.",
+        description: "Please try again.",
       });
     } finally {
       setIsSubmitting(false);
@@ -109,13 +110,6 @@ const DiabetesCheckDialog: React.FC<DiabetesCheckDialogProps> = ({
     setFeedbackMessage({ message: "", type: null });
   };
 
-  const handleSkip = () => {
-    toast.info("Submission skipped", {
-      description: "Remember to track your levels regularly!",
-    });
-    onComplete("");
-  };
-
   return (
     <Dialog open={open}>
       <DialogContent className="max-w-md [&>button:last-child]:hidden">
@@ -125,8 +119,7 @@ const DiabetesCheckDialog: React.FC<DiabetesCheckDialogProps> = ({
             Diabetes Check
           </DialogTitle>
           <DialogDescription>
-            Please enter your current blood glucose reading before continuing.
-            This helps track your diabetes management while gaming.
+            It's time for your regular blood glucose check. Please enter your current reading before continuing the game.
           </DialogDescription>
         </DialogHeader>
 
@@ -199,17 +192,9 @@ const DiabetesCheckDialog: React.FC<DiabetesCheckDialogProps> = ({
               {!feedbackMessage.type ? (
                 <>
                   <Button
-                    type="button"
-                    variant="outline"
-                    disabled={isSubmitting}
-                    onClick={handleSkip}
-                  >
-                    Skip for now
-                  </Button>
-                  <Button
                     type="submit"
                     disabled={isSubmitting}
-                    className="flex items-center gap-2"
+                    className="flex items-center gap-2 w-full"
                   >
                     <Check className="h-4 w-4" />
                     {isSubmitting ? "Submitting..." : "Submit Reading"}

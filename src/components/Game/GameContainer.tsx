@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import { Canvas } from '@react-three/fiber';
 import GameScene from './GameScene';
@@ -10,19 +11,22 @@ import BackgroundMusic from './BackgroundMusic';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { Button } from '@/components/ui/button';
 import { Volume2, VolumeX } from 'lucide-react';
+import DiabetesCheckDialog from './DiabetesCheckDialog';
 
 const GameContainer: React.FC = () => {
-  const [gameState, setGameState] = useState<'register' | 'start' | 'playing' | 'gameover'>('register');
+  const [gameState, setGameState] = useState<'register' | 'start' | 'playing' | 'gameover' | 'paused'>('register');
   const [score, setScore] = useState(0);
   const [highScore, setHighScore] = useState(0);
   const [username, setUsername] = useState("");
   const scoreRef = useRef(0);
   const isMobile = useIsMobile();
-  const gameStateRef = useRef<'register' | 'start' | 'playing' | 'gameover'>('register');
+  const gameStateRef = useRef<'register' | 'start' | 'playing' | 'gameover' | 'paused'>('register');
   const [isMusicEnabled, setIsMusicEnabled] = useState(true);
   const [musicInitialized, setMusicInitialized] = useState(false);
   const backgroundMusicRef = useRef<any>(null);
   const initAudioRef = useRef<(() => void) | null>(null);
+  const [showDiabetesCheck, setShowDiabetesCheck] = useState(false);
+  const diabetesCheckTimerRef = useRef<NodeJS.Timeout | null>(null);
   
   // Player movement controls - referenced by TouchControls
   const [moveLeft, setMoveLeft] = useState<() => void>(() => () => {});
@@ -51,6 +55,31 @@ const GameContainer: React.FC = () => {
     // Update scoreRef to keep it in sync with score state
     scoreRef.current = score;
   }, [score, highScore]);
+
+  // Set up diabetes check timer when the game is playing
+  useEffect(() => {
+    if (gameState === 'playing') {
+      // Clear any existing timer
+      if (diabetesCheckTimerRef.current) {
+        clearTimeout(diabetesCheckTimerRef.current);
+      }
+      
+      // Set new timer for 60 seconds (60000ms)
+      diabetesCheckTimerRef.current = setTimeout(() => {
+        // Pause the game and show diabetes check dialog
+        setGameState('paused');
+        setShowDiabetesCheck(true);
+      }, 60000);
+    }
+    
+    // Clean up timer when game state changes
+    return () => {
+      if (diabetesCheckTimerRef.current) {
+        clearTimeout(diabetesCheckTimerRef.current);
+        diabetesCheckTimerRef.current = null;
+      }
+    };
+  }, [gameState]);
 
   const handleRegistrationComplete = (registeredUsername: string) => {
     setUsername(registeredUsername);
@@ -138,6 +167,25 @@ const GameContainer: React.FC = () => {
     initAudioRef.current = initFn;
   };
 
+  const handleDiabetesCheckComplete = (bloodGlucose: string) => {
+    setShowDiabetesCheck(false);
+    
+    // Resume game
+    setTimeout(() => {
+      setGameState('playing');
+      
+      // Reset the diabetes check timer
+      if (diabetesCheckTimerRef.current) {
+        clearTimeout(diabetesCheckTimerRef.current);
+      }
+      
+      diabetesCheckTimerRef.current = setTimeout(() => {
+        setGameState('paused');
+        setShowDiabetesCheck(true);
+      }, 60000);
+    }, 50);
+  };
+
   // Extract the music toggle button to a separate constant to be used across all screens
   // Updated positioning and z-index to ensure visibility on mobile devices
   const MusicToggleButton = () => (
@@ -163,7 +211,7 @@ const GameContainer: React.FC = () => {
       {/* Background Music - plays on all screens */}
       <BackgroundMusic
         url="/sounds/best-game-console-301284.mp3"
-        playing={isMusicEnabled}
+        playing={isMusicEnabled && gameState !== 'paused'}
         volume={0.4}
         onInit={handleMusicInit}
       />
@@ -171,7 +219,16 @@ const GameContainer: React.FC = () => {
       {/* Music toggle button - now visible on all screens */}
       <MusicToggleButton />
 
-      {gameState === "playing" && (
+      {/* Diabetes Check Dialog */}
+      {showDiabetesCheck && (
+        <DiabetesCheckDialog 
+          open={showDiabetesCheck}
+          onComplete={handleDiabetesCheckComplete}
+          username={username}
+        />
+      )}
+
+      {(gameState === "playing" || gameState === "paused") && (
         <Canvas shadows camera={{ position: [0, 5, 10], fov: 70 }}>
           <GameScene
             onCollectSyringe={handleCollectSyringe}
@@ -179,6 +236,7 @@ const GameContainer: React.FC = () => {
             onHitObstacle={handleHitObstacle}
             setMoveLeft={setMoveLeft}
             setMoveRight={setMoveRight}
+            isPaused={gameState === 'paused'}
           />
         </Canvas>
       )}
@@ -193,10 +251,10 @@ const GameContainer: React.FC = () => {
         <StartScreen onStartGame={handleStartGame} highScore={highScore} />
       )}
 
-      {gameState === "playing" && (
+      {(gameState === "playing" || gameState === "paused") && (
         <>
           <HUD score={score} highScore={highScore} />
-          {isMobile && (
+          {isMobile && gameState === "playing" && (
             <TouchControls onSwipeLeft={moveLeft} onSwipeRight={moveRight} />
           )}
         </>

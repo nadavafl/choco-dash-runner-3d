@@ -16,6 +16,7 @@ interface GameSceneProps {
   onHitObstacle: () => void;
   setMoveLeft: React.Dispatch<React.SetStateAction<() => void>>;
   setMoveRight: React.Dispatch<React.SetStateAction<() => void>>;
+  isPaused: boolean;
 }
 
 interface GameObject {
@@ -29,7 +30,8 @@ const GameScene: React.FC<GameSceneProps> = ({
   onCollectApple,
   onHitObstacle,
   setMoveLeft,
-  setMoveRight
+  setMoveRight,
+  isPaused
 }) => {
   const speedRef = useRef(15);
   const playerRef = useRef<THREE.Group>(null);
@@ -68,7 +70,7 @@ const GameScene: React.FC<GameSceneProps> = ({
 
   // Move player left
   const moveLeft = () => {
-    if (currentLane > 0 && !movingRef.current) {
+    if (currentLane > 0 && !movingRef.current && !isPaused) {
       movingRef.current = true;
       setCurrentLane(currentLane - 1);
     }
@@ -76,7 +78,7 @@ const GameScene: React.FC<GameSceneProps> = ({
 
   // Move player right
   const moveRight = () => {
-    if (currentLane < lanes.length - 1 && !movingRef.current) {
+    if (currentLane < lanes.length - 1 && !movingRef.current && !isPaused) {
       movingRef.current = true;
       setCurrentLane(currentLane + 1);
     }
@@ -86,12 +88,12 @@ const GameScene: React.FC<GameSceneProps> = ({
   useEffect(() => {
     setMoveLeft(() => moveLeft);
     setMoveRight(() => moveRight);
-  }, [currentLane, setMoveLeft, setMoveRight]);
+  }, [currentLane, setMoveLeft, setMoveRight, isPaused]);
 
   // Set up keyboard controls
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (!gameActiveRef.current) return;
+      if (!gameActiveRef.current || isPaused) return;
       
       if (e.key === 'ArrowLeft' || e.key === 'a') {
         moveLeft();
@@ -102,11 +104,11 @@ const GameScene: React.FC<GameSceneProps> = ({
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [currentLane]);
+  }, [currentLane, isPaused]);
 
   // Spawn new objects - Updated to prevent 3 of the same type in a row
   const spawnObject = () => {
-    if (!gameActiveRef.current) return;
+    if (!gameActiveRef.current || isPaused) return;
     
     // Collect all used lanes so we don't spawn too many objects in a row
     const usedLanes: number[] = [];
@@ -204,7 +206,7 @@ const GameScene: React.FC<GameSceneProps> = ({
 
   // Check collisions between player and objects
   const checkCollisions = () => {
-    if (!playerRef.current || !gameActiveRef.current) return;
+    if (!playerRef.current || !gameActiveRef.current || isPaused) return;
     
     // Use a simple distance-based collision detection instead of Box3
     // This avoids potential issues with complex Three.js objects and cloning
@@ -248,7 +250,7 @@ const GameScene: React.FC<GameSceneProps> = ({
 
   // Main game loop
   useFrame((_, delta) => {
-    if (!gameActiveRef.current) return;
+    if (!gameActiveRef.current || isPaused) return;
     
     // Increase game speed over time (slightly faster acceleration)
     speedRef.current = Math.min(60, speedRef.current + delta * 0.25);
@@ -310,13 +312,13 @@ const GameScene: React.FC<GameSceneProps> = ({
       
       {/* Bridge and Water Environment */}
       <fog attach="fog" args={['#E6F2FF', 30, 90]} />
-      <Track speed={speedRef.current} />
+      <Track speed={isPaused ? 0 : speedRef.current} />
       
       {/* Player */}
       <Player 
         position={playerPosition} 
         ref={playerRef} 
-        speed={speedRef.current} 
+        speed={isPaused ? 0 : speedRef.current} 
       />
 
       {/* Game Objects (Obstacles & Collectibles) */}
@@ -333,14 +335,6 @@ const GameScene: React.FC<GameSceneProps> = ({
         <planeGeometry args={[10, 200]} />
         <shadowMaterial transparent opacity={0.4} />
       </mesh>
-
-      {/* Add touch controls component for mobile devices */}
-      {isMobile && (
-        <TouchControls 
-          onSwipeLeft={moveLeft}
-          onSwipeRight={moveRight}
-        />
-      )}
     </>
   );
 };
