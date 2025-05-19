@@ -129,27 +129,28 @@ const FoodRecognition: React.FC<FoodRecognitionProps> = ({
         setNutrition(nutritionData);
         setAnalysisCompleted(true);
 
-        // Determine the effect on blood glucose based on carbs/sugar content
-        // This is a simplified approach - in a real app, this would be more sophisticated
-        // For now fixed to 0 and 100
-        if (nutritionData.carbs < 0 || nutritionData.sugar < 0) {
-          onFoodAnalyzed("low");
-        } else if (nutritionData.carbs > 100 || nutritionData.sugar > 100) {
-          onFoodAnalyzed("high");
+        // Still calculate the effect on blood glucose, but don't block continuation
+        let effect: "low" | "normal" | "high";
+        if (nutritionData.carbs < 15 || nutritionData.sugar < 5) {
+          effect = "low";
+        } else if (nutritionData.carbs > 30 || nutritionData.sugar > 15) {
+          effect = "high";
         } else {
-          onFoodAnalyzed("normal");
+          effect = "normal";
         }
-
+        
         toast.success("Nutrition information retrieved");
       } else {
         setNutrition(null);
-        setAnalysisCompleted(false);
+        // Even if no nutrition data found, mark as completed so user can proceed
+        setAnalysisCompleted(true);
         toast.error("No nutritional data found for this food");
       }
     } catch (err) {
       console.error(err);
       setNutrition(null);
-      setAnalysisCompleted(false);
+      // Even if there's an error, mark as completed so user can proceed
+      setAnalysisCompleted(true);
       toast.error("Failed to fetch nutrition information");
     } finally {
       setLoading(false);
@@ -276,22 +277,24 @@ const FoodRecognition: React.FC<FoodRecognitionProps> = ({
                 <div className="font-medium">Sugar:</div>
                 <div>{nutrition.sugar} g</div>
               </div>
-              
-              {analysisCompleted && (
-                <Button 
-                  onClick={() => onFoodAnalyzed(nutrition.carbs < 15 ? "low" : nutrition.carbs > 30 ? "high" : "normal")}
-                  className="mt-4 w-full bg-green-600 hover:bg-green-700 text-white flex items-center justify-center gap-2"
-                >
-                  Proceed to Diabetes Check
-                  <ArrowRight className="h-4 w-4" />
-                </Button>
-              )}
             </div>
+          )}
+          
+          {/* Always show the "Proceed to Diabetes Check" button once analysis is completed,
+              regardless of the analysis result or even if nutrition data wasn't found */}
+          {analysisCompleted && (
+            <Button 
+              onClick={() => onFoodAnalyzed("normal")} // Always pass "normal" to allow continuation
+              className="mt-4 w-full bg-green-600 hover:bg-green-700 text-white flex items-center justify-center gap-2"
+            >
+              Proceed to Diabetes Check
+              <ArrowRight className="h-4 w-4" />
+            </Button>
           )}
 
           {!loading && !analyzing && prediction && !nutrition && (
-            <div className="mt-4 text-red-500 p-3 bg-red-50 rounded-lg w-full text-center">
-              ❌ No nutritional values found for this food
+            <div className="mt-4 text-amber-500 p-3 bg-amber-50 rounded-lg w-full text-center">
+              ⚠️ No nutritional values found for this food. You can still proceed.
             </div>
           )}
         </div>

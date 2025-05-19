@@ -54,7 +54,6 @@ const DiabetesCheckDialog: React.FC<DiabetesCheckDialogProps> = ({
   }>({ message: "", type: null });
   const [showFoodRecognition, setShowFoodRecognition] = useState(false);
   const [canContinue, setCanContinue] = useState(true);
-  const [isWaitingForAnalysis, setIsWaitingForAnalysis] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -71,13 +70,13 @@ const DiabetesCheckDialog: React.FC<DiabetesCheckDialogProps> = ({
     
     if (bloodGlucoseValue < 70) {
       setFeedbackMessage({
-        message: "I am weak, let's eat and retest afterward.",
+        message: "Blood glucose is low. Please eat something and check its nutritional value.",
         type: "low",
       });
       setShowFoodRecognition(true);
-      setCanContinue(false);
-      setIsWaitingForAnalysis(true);
-      toast.warning("Low blood glucose detected! Please eat something and recheck.");
+      // Always allow continuation after food analysis
+      setCanContinue(true);
+      toast.warning("Low blood glucose detected! Please eat something and check its nutritional value.");
     } else if (bloodGlucoseValue >= 70 && bloodGlucoseValue < 140) {
       setFeedbackMessage({
         message: "Oh great! I can continue playing.",
@@ -86,10 +85,11 @@ const DiabetesCheckDialog: React.FC<DiabetesCheckDialogProps> = ({
       setCanContinue(true);
     } else {
       setFeedbackMessage({
-        message: "I need to drink some water or take a shot and retest.",
+        message: "Blood glucose is high. Consider drinking water or taking medication as needed.",
         type: "high",
       });
-      setCanContinue(false);
+      // Always allow continuation even with high blood glucose
+      setCanContinue(true);
     }
 
     try {
@@ -115,30 +115,29 @@ const DiabetesCheckDialog: React.FC<DiabetesCheckDialogProps> = ({
   };
   
   const handleFoodAnalyzed = (bloodGlucoseEffect: 'low' | 'normal' | 'high') => {
-    setIsWaitingForAnalysis(false);
-    
+    // Provide feedback based on food analysis, but always allow continuation
     if (bloodGlucoseEffect === 'normal') {
       setFeedbackMessage({
         message: "Great food choice! Your blood glucose should return to normal soon.",
         type: "normal",
       });
-      setCanContinue(true);
-      toast.success("Good food choice for your current blood glucose level");
+      toast.success("Food analysis complete - you can continue playing");
     } else if (bloodGlucoseEffect === 'high') {
       setFeedbackMessage({
-        message: "This food contains too much sugar or carbs. Try something with more protein and less sugar.",
+        message: "This food contains high sugar or carbs. Be mindful of your intake.",
         type: "high",
       });
-      setCanContinue(true);
-      toast.warning("Not an ideal food choice for low blood glucose");
+      toast.info("Food analysis complete - you can continue playing");
     } else {
       setFeedbackMessage({
-        message: "This food doesn't have enough carbs to raise your blood glucose. Try something with more carbs.",
+        message: "This food has low carbs. Consider monitoring your blood glucose.",
         type: "low",
       });
-      setCanContinue(true);
-      toast.warning("This food may not help with low blood glucose");
+      toast.info("Food analysis complete - you can continue playing");
     }
+    
+    // Always set canContinue to true regardless of analysis result
+    setCanContinue(true);
   };
   
   const handleContinue = () => {
@@ -146,7 +145,6 @@ const DiabetesCheckDialog: React.FC<DiabetesCheckDialogProps> = ({
     onComplete(form.getValues().bloodGlucose);
     setFeedbackMessage({ message: "", type: null });
     setShowFoodRecognition(false);
-    setIsWaitingForAnalysis(false);
   };
 
   return (
@@ -245,8 +243,7 @@ const DiabetesCheckDialog: React.FC<DiabetesCheckDialogProps> = ({
                   <Button
                     type="button"
                     onClick={handleContinue}
-                    disabled={!canContinue}
-                    className={`flex items-center gap-2 w-full sm:w-auto ${!canContinue ? 'opacity-50 cursor-not-allowed' : ''}`}
+                    className="flex items-center gap-2 w-full sm:w-auto"
                   >
                     Continue
                   </Button>
@@ -304,9 +301,15 @@ const DiabetesCheckDialog: React.FC<DiabetesCheckDialogProps> = ({
               </Alert>
             )}
             
-            {/* Note: We've removed the "Continue Playing" button from here.
-                Instead, the user will use the "Proceed to Diabetes Check" button
-                in the FoodRecognition component after successful analysis */}
+            {/* Added a continue button here as well for better UX */}
+            {canContinue && (
+              <Button 
+                onClick={handleContinue}
+                className="w-full bg-green-600 hover:bg-green-700 text-white"
+              >
+                Continue Playing
+              </Button>
+            )}
           </div>
         )}
       </DialogContent>
