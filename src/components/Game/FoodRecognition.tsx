@@ -131,9 +131,10 @@ const FoodRecognition: React.FC<FoodRecognitionProps> = ({
 
         // Determine the effect on blood glucose based on carbs/sugar content
         // This is a simplified approach - in a real app, this would be more sophisticated
-        if (nutritionData.carbs < 15 || nutritionData.sugar < 5) {
+        // For now fixed to 0 and 100
+        if (nutritionData.carbs < 0 || nutritionData.sugar < 0) {
           onFoodAnalyzed("low");
-        } else if (nutritionData.carbs > 30 || nutritionData.sugar > 15) {
+        } else if (nutritionData.carbs > 100 || nutritionData.sugar > 100) {
           onFoodAnalyzed("high");
         } else {
           onFoodAnalyzed("normal");
