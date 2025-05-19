@@ -122,9 +122,8 @@ const FoodRecognition: React.FC<FoodRecognitionProps> = ({
               (n) => n.nutrientName === "Total lipid (fat)"
             )?.value || 0,
           sugar:
-            food.foodNutrients.find(
-              (n) => n.nutrientName === "Sugars, total including NLEA"
-            )?.value || 0,
+            food.foodNutrients.find((n) => n.nutrientName === "Sugars, total")
+              ?.value || 0,
         };
 
         setNutrition(nutritionData);
