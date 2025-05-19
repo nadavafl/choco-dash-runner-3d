@@ -1,8 +1,9 @@
+
 import React, { useRef, useState, useEffect } from "react";
 import * as tf from "@tensorflow/tfjs";
 import * as mobilenet from "@tensorflow-models/mobilenet";
 import axios from "axios";
-import { Check, Camera, X } from "lucide-react";
+import { Check, Camera, X, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -20,6 +21,7 @@ const FoodRecognition: React.FC<FoodRecognitionProps> = ({
   const [prediction, setPrediction] = useState<string | null>(null);
   const [nutrition, setNutrition] = useState<any | null>(null);
   const [loading, setLoading] = useState(false);
+  const [analyzing, setAnalyzing] = useState(false);
   const imageRef = useRef<HTMLImageElement | null>(null);
   const modelRef = useRef<mobilenet.MobileNet | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
@@ -71,6 +73,7 @@ const FoodRecognition: React.FC<FoodRecognitionProps> = ({
     }
 
     setLoading(true);
+    setAnalyzing(true);
     try {
       const predictions = await modelRef.current.classify(imageRef.current);
       const label = predictions[0]?.className.split(",")[0];
@@ -80,6 +83,7 @@ const FoodRecognition: React.FC<FoodRecognitionProps> = ({
     } catch (error) {
       console.error("Error classifying image:", error);
       toast.error("Failed to analyze food image");
+      setAnalyzing(false);
     }
   };
 
@@ -143,6 +147,7 @@ const FoodRecognition: React.FC<FoodRecognitionProps> = ({
       toast.error("Failed to fetch nutrition information");
     } finally {
       setLoading(false);
+      setAnalyzing(false);
     }
   };
 
@@ -189,15 +194,26 @@ const FoodRecognition: React.FC<FoodRecognitionProps> = ({
                   crossOrigin="anonymous"
                   className="w-full h-auto object-cover max-h-64"
                 />
+                {analyzing && (
+                  <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+                    <div className="text-white text-center">
+                      <Loader2 className="h-8 w-8 animate-spin mx-auto mb-2" />
+                      <p>Analyzing food...</p>
+                    </div>
+                  </div>
+                )}
               </div>
 
               <Button
                 onClick={classifyImage}
                 className="bg-purple-600 hover:bg-purple-700 text-white w-full md:w-auto flex items-center justify-center gap-2"
-                disabled={loading}
+                disabled={loading || analyzing}
               >
-                {loading ? (
-                  <>Analyzing...</>
+                {loading || analyzing ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    Analyzing...
+                  </>
                 ) : (
                   <>
                     <Check className="h-4 w-4" />
@@ -206,11 +222,12 @@ const FoodRecognition: React.FC<FoodRecognitionProps> = ({
                 )}
               </Button>
 
-              {!loading && (
+              {!loading && !analyzing && (
                 <Button
                   onClick={triggerFileInput}
                   variant="outline"
                   className="mt-2 w-full md:w-auto flex items-center justify-center gap-2 border-purple-300"
+                  disabled={analyzing}
                 >
                   <X className="h-4 w-4" />
                   Take New Photo
@@ -219,8 +236,11 @@ const FoodRecognition: React.FC<FoodRecognitionProps> = ({
             </div>
           )}
 
-          {loading && (
-            <div className="text-center mt-4">⏳ Analyzing your food...</div>
+          {analyzing && (
+            <div className="text-center mt-4 flex items-center gap-2">
+              <Loader2 className="h-4 w-4 animate-spin" />
+              Analyzing your food...
+            </div>
           )}
 
           {prediction && nutrition && (
@@ -251,7 +271,7 @@ const FoodRecognition: React.FC<FoodRecognitionProps> = ({
             </div>
           )}
 
-          {!loading && prediction && !nutrition && (
+          {!loading && !analyzing && prediction && !nutrition && (
             <div className="mt-4 text-red-500 p-3 bg-red-50 rounded-lg w-full text-center">
               ❌ No nutritional values found for this food
             </div>

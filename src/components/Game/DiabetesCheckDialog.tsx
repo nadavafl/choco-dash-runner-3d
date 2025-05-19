@@ -54,6 +54,7 @@ const DiabetesCheckDialog: React.FC<DiabetesCheckDialogProps> = ({
   }>({ message: "", type: null });
   const [showFoodRecognition, setShowFoodRecognition] = useState(false);
   const [canContinue, setCanContinue] = useState(true);
+  const [isWaitingForAnalysis, setIsWaitingForAnalysis] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -75,6 +76,7 @@ const DiabetesCheckDialog: React.FC<DiabetesCheckDialogProps> = ({
       });
       setShowFoodRecognition(true);
       setCanContinue(false);
+      setIsWaitingForAnalysis(true);
       toast.warning("Low blood glucose detected! Please eat something and recheck.");
     } else if (bloodGlucoseValue >= 70 && bloodGlucoseValue < 140) {
       setFeedbackMessage({
@@ -113,6 +115,8 @@ const DiabetesCheckDialog: React.FC<DiabetesCheckDialogProps> = ({
   };
   
   const handleFoodAnalyzed = (bloodGlucoseEffect: 'low' | 'normal' | 'high') => {
+    setIsWaitingForAnalysis(false);
+    
     if (bloodGlucoseEffect === 'normal') {
       setFeedbackMessage({
         message: "Great food choice! Your blood glucose should return to normal soon.",
@@ -142,6 +146,7 @@ const DiabetesCheckDialog: React.FC<DiabetesCheckDialogProps> = ({
     onComplete(form.getValues().bloodGlucose);
     setFeedbackMessage({ message: "", type: null });
     setShowFoodRecognition(false);
+    setIsWaitingForAnalysis(false);
   };
 
   return (
@@ -302,10 +307,10 @@ const DiabetesCheckDialog: React.FC<DiabetesCheckDialogProps> = ({
             <DialogFooter>
               <Button
                 onClick={handleContinue}
-                disabled={!canContinue}
-                className={`${!canContinue ? 'opacity-50 cursor-not-allowed' : ''}`}
+                disabled={!canContinue || isWaitingForAnalysis}
+                className={`${(!canContinue || isWaitingForAnalysis) ? 'opacity-50 cursor-not-allowed' : ''}`}
               >
-                Continue Playing
+                {isWaitingForAnalysis ? 'Analyzing Food...' : 'Continue Playing'}
               </Button>
             </DialogFooter>
           </div>
