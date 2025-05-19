@@ -31,7 +31,7 @@ const SettingsDialog: React.FC<SettingsDialogProps> = ({
   const [newClub, setNewClub] = useState<Club>({ name: "", dayOfWeek: "Monday", time: "12:00" });
   
   // Days of the week for selection
-  const daysOfWeek = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+  const daysOfWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
   
   // Load clubs from localStorage when component mounts
   useEffect(() => {
