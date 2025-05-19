@@ -1,4 +1,3 @@
-
 import React, { useRef, useState, useEffect } from "react";
 import * as tf from "@tensorflow/tfjs";
 import * as mobilenet from "@tensorflow-models/mobilenet";
@@ -129,7 +128,7 @@ const FoodRecognition: React.FC<FoodRecognitionProps> = ({
         setNutrition(nutritionData);
         setAnalysisCompleted(true);
 
-        // Still calculate the effect on blood glucose, but don't block continuation
+        // Calculate the effect on blood glucose
         let effect: "low" | "normal" | "high";
         if (nutritionData.carbs < 15 || nutritionData.sugar < 5) {
           effect = "low";
@@ -156,6 +155,22 @@ const FoodRecognition: React.FC<FoodRecognitionProps> = ({
       setLoading(false);
       setAnalyzing(false);
     }
+  };
+
+  const handleProceedToDiabetesCheck = () => {
+    // Determine the effect based on nutrition data if available
+    let effect: "low" | "normal" | "high" = "normal";
+    
+    if (nutrition) {
+      if (nutrition.carbs < 15 || nutrition.sugar < 5) {
+        effect = "low";
+      } else if (nutrition.carbs > 30 || nutrition.sugar > 15) {
+        effect = "high";
+      }
+    }
+    
+    // Call the callback with the determined effect
+    onFoodAnalyzed(effect);
   };
 
   return (
@@ -284,7 +299,7 @@ const FoodRecognition: React.FC<FoodRecognitionProps> = ({
               regardless of the analysis result or even if nutrition data wasn't found */}
           {analysisCompleted && (
             <Button 
-              onClick={() => onFoodAnalyzed("normal")} // Always pass "normal" to allow continuation
+              onClick={handleProceedToDiabetesCheck}
               className="mt-4 w-full bg-green-600 hover:bg-green-700 text-white flex items-center justify-center gap-2"
             >
               Proceed to Diabetes Check

@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import {
   Dialog,
@@ -135,6 +134,10 @@ const DiabetesCheckDialog: React.FC<DiabetesCheckDialogProps> = ({
       });
       toast.info("Food analysis complete - you can continue playing");
     }
+    
+    // Important: After food analysis, we need to set showFoodRecognition to false
+    // to return to the diabetes check form with the feedback
+    setShowFoodRecognition(false);
     
     // Always set canContinue to true regardless of analysis result
     setCanContinue(true);
@@ -299,16 +302,6 @@ const DiabetesCheckDialog: React.FC<DiabetesCheckDialogProps> = ({
                   {feedbackMessage.message}
                 </AlertDescription>
               </Alert>
-            )}
-            
-            {/* Added a continue button here as well for better UX */}
-            {canContinue && (
-              <Button 
-                onClick={handleContinue}
-                className="w-full bg-green-600 hover:bg-green-700 text-white"
-              >
-                Continue Playing
-              </Button>
             )}
           </div>
         )}
