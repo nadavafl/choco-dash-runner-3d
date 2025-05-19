@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+
+import React, { useState, useEffect } from "react";
 import {
   Dialog,
   DialogContent,
@@ -52,7 +53,8 @@ const DiabetesCheckDialog: React.FC<DiabetesCheckDialogProps> = ({
     type: "low" | "normal" | "high" | null;
   }>({ message: "", type: null });
   const [showFoodRecognition, setShowFoodRecognition] = useState(false);
-  const [canContinue, setCanContinue] = useState(true);
+  const [hasValidReading, setHasValidReading] = useState(false);
+  const [bloodGlucoseValue, setBloodGlucoseValue] = useState<string>("");
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -61,34 +63,55 @@ const DiabetesCheckDialog: React.FC<DiabetesCheckDialogProps> = ({
     },
   });
 
+  // Reset form state when the dialog is opened
+  useEffect(() => {
+    if (open) {
+      // Only reset if we're not showing food recognition and don't have a valid reading
+      if (!showFoodRecognition && !hasValidReading) {
+        form.reset();
+        setFeedbackMessage({ message: "", type: null });
+        setHasValidReading(false);
+      }
+    }
+  }, [open, form, showFoodRecognition, hasValidReading]);
+
+  // Reset validation when returning from food recognition
+  useEffect(() => {
+    if (!showFoodRecognition && feedbackMessage.type === "low") {
+      // If we're returning from food recognition for low blood sugar,
+      // we still need to validate the reading again
+      setHasValidReading(false);
+    }
+  }, [showFoodRecognition, feedbackMessage.type]);
+
   const submitReading = async (values: z.infer<typeof formSchema>) => {
     setIsSubmitting(true);
     
-    // Determine feedback message based on blood glucose value
-    const bloodGlucoseValue = Number(values.bloodGlucose);
+    // Store the blood glucose value
+    const inputBloodGlucoseValue = Number(values.bloodGlucose);
+    setBloodGlucoseValue(values.bloodGlucose);
     
-    if (bloodGlucoseValue < 70) {
+    // Determine feedback message based on blood glucose value
+    if (inputBloodGlucoseValue < 70) {
       setFeedbackMessage({
         message: "Blood glucose is low. Please eat something and check its nutritional value.",
         type: "low",
       });
       setShowFoodRecognition(true);
-      // Always allow continuation after food analysis
-      setCanContinue(true);
+      setHasValidReading(false); // Will need to revalidate after food analysis
       toast.warning("Low blood glucose detected! Please eat something and check its nutritional value.");
-    } else if (bloodGlucoseValue >= 70 && bloodGlucoseValue < 140) {
+    } else if (inputBloodGlucoseValue >= 70 && inputBloodGlucoseValue < 140) {
       setFeedbackMessage({
         message: "Oh great! I can continue playing.",
         type: "normal",
       });
-      setCanContinue(true);
+      setHasValidReading(true);
     } else {
       setFeedbackMessage({
         message: "Blood glucose is high. Consider drinking water or taking medication as needed.",
         type: "high",
       });
-      // Always allow continuation even with high blood glucose
-      setCanContinue(true);
+      setHasValidReading(true);
     }
 
     try {
@@ -114,40 +137,51 @@ const DiabetesCheckDialog: React.FC<DiabetesCheckDialogProps> = ({
   };
   
   const handleFoodAnalyzed = (bloodGlucoseEffect: 'low' | 'normal' | 'high') => {
-    // Provide feedback based on food analysis, but always allow continuation
+    // Provide feedback based on food analysis
     if (bloodGlucoseEffect === 'normal') {
       setFeedbackMessage({
         message: "Great food choice! Your blood glucose should return to normal soon.",
         type: "normal",
       });
-      toast.success("Food analysis complete - you can continue playing");
+      toast.success("Food analysis complete - please enter a new blood glucose reading");
     } else if (bloodGlucoseEffect === 'high') {
       setFeedbackMessage({
         message: "This food contains high sugar or carbs. Be mindful of your intake.",
         type: "high",
       });
-      toast.info("Food analysis complete - you can continue playing");
+      toast.info("Food analysis complete - please enter a new blood glucose reading");
     } else {
       setFeedbackMessage({
         message: "This food has low carbs. Consider monitoring your blood glucose.",
         type: "low",
       });
-      toast.info("Food analysis complete - you can continue playing");
+      toast.info("Food analysis complete - please enter a new blood glucose reading");
     }
     
-    // Important: After food analysis, we need to set showFoodRecognition to false
-    // to return to the diabetes check form with the feedback
+    // Important: After food analysis, return to the diabetes check form
     setShowFoodRecognition(false);
     
-    // Always set canContinue to true regardless of analysis result
-    setCanContinue(true);
+    // Reset the form so user can enter a new reading after food analysis
+    form.reset();
+    setHasValidReading(false);
   };
   
   const handleContinue = () => {
-    form.reset();
-    onComplete(form.getValues().bloodGlucose);
-    setFeedbackMessage({ message: "", type: null });
-    setShowFoodRecognition(false);
+    // Only allow continuation if we have a valid reading
+    if (hasValidReading) {
+      form.reset();
+      onComplete(bloodGlucoseValue);
+      setFeedbackMessage({ message: "", type: null });
+      setShowFoodRecognition(false);
+      setHasValidReading(false);
+    } else {
+      // If we don't have a valid reading, prompt the user to submit one
+      toast.error("Please submit a valid blood glucose reading before continuing");
+      form.setError("bloodGlucose", { 
+        type: "manual", 
+        message: "Blood glucose reading is required" 
+      });
+    }
   };
 
   return (
@@ -243,13 +277,24 @@ const DiabetesCheckDialog: React.FC<DiabetesCheckDialogProps> = ({
                     </Button>
                   </>
                 ) : (
-                  <Button
-                    type="button"
-                    onClick={handleContinue}
-                    className="flex items-center gap-2 w-full sm:w-auto"
-                  >
-                    Continue
-                  </Button>
+                  <div className="w-full flex flex-col sm:flex-row gap-2">
+                    <Button
+                      type="button"
+                      onClick={handleContinue}
+                      className="flex-1 flex items-center justify-center gap-2"
+                      disabled={!hasValidReading}
+                    >
+                      Continue
+                    </Button>
+                    <Button
+                      type="submit"
+                      className="flex-1 flex items-center justify-center gap-2"
+                      disabled={isSubmitting}
+                    >
+                      <Check className="h-4 w-4" />
+                      New Reading
+                    </Button>
+                  </div>
                 )}
               </DialogFooter>
             </form>
