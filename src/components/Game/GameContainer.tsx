@@ -15,10 +15,8 @@ const GameContainer: React.FC = () => {
   const [gameState, setGameState] = useState<'register' | 'start' | 'playing' | 'gameover'>('register');
   const [score, setScore] = useState(0);
   const [highScore, setHighScore] = useState(0);
-  const [lives, setLives] = useState(3);
   const [username, setUsername] = useState("");
   const scoreRef = useRef(0);
-  const livesRef = useRef(3);
   const isMobile = useIsMobile();
   const gameStateRef = useRef<'register' | 'start' | 'playing' | 'gameover'>('register');
   const [isMusicEnabled, setIsMusicEnabled] = useState(true);
@@ -54,16 +52,6 @@ const GameContainer: React.FC = () => {
     scoreRef.current = score;
   }, [score, highScore]);
 
-  useEffect(() => {
-    // Update livesRef to keep it in sync with lives state
-    livesRef.current = lives;
-    
-    // End game if lives reach zero
-    if (lives <= 0 && gameState === 'playing') {
-      setGameState('gameover');
-    }
-  }, [lives, gameState]);
-
   const handleRegistrationComplete = (registeredUsername: string) => {
     setUsername(registeredUsername);
     setGameState('start');
@@ -73,8 +61,6 @@ const GameContainer: React.FC = () => {
     // Reset game state before transitioning
     setScore(0);
     scoreRef.current = 0;
-    setLives(3);
-    livesRef.current = 3;
     
     // Use setTimeout to ensure state updates complete before game starts
     // This helps prevent potential DataCloneError during state transition
@@ -93,19 +79,21 @@ const GameContainer: React.FC = () => {
   const handleGameOver = () => {
     setGameState('gameover');
   };
-
+  
+  // Updated handlers to match the new scoring system
   const handleCollectSyringe = () => {
-    // Restore 1 life, up to a maximum of 3
-    setLives(prevLives => Math.min(3, prevLives + 1));
+    // Syringe now adds 20 points
+    setScore(prevScore => prevScore + 20);
   };
   
   const handleCollectApple = () => {
-    // Increase score by 10 points
+    // Apple still adds 10 points
     setScore(prevScore => prevScore + 10);
   };
 
   const handleHitObstacle = () => {
-    setLives(prevLives => prevLives - 1);
+    // Chocolate now removes 5 points
+    setScore(prevScore => prevScore - 5);
   };
 
   // Attempt to initialize music when any user interaction occurs
@@ -189,8 +177,6 @@ const GameContainer: React.FC = () => {
             onCollectSyringe={handleCollectSyringe}
             onCollectApple={handleCollectApple}
             onHitObstacle={handleHitObstacle}
-            onGameOver={handleGameOver}
-            lives={lives}
             setMoveLeft={setMoveLeft}
             setMoveRight={setMoveRight}
           />
@@ -209,7 +195,7 @@ const GameContainer: React.FC = () => {
 
       {gameState === "playing" && (
         <>
-          <HUD score={score} highScore={highScore} lives={lives} />
+          <HUD score={score} highScore={highScore} />
           {isMobile && (
             <TouchControls onSwipeLeft={moveLeft} onSwipeRight={moveRight} />
           )}

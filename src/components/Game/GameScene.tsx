@@ -1,3 +1,4 @@
+
 import React, { useRef, useState, useEffect } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
@@ -13,8 +14,6 @@ interface GameSceneProps {
   onCollectSyringe: () => void;
   onCollectApple: () => void;
   onHitObstacle: () => void;
-  onGameOver: () => void;
-  lives: number;
   setMoveLeft: React.Dispatch<React.SetStateAction<() => void>>;
   setMoveRight: React.Dispatch<React.SetStateAction<() => void>>;
 }
@@ -29,8 +28,6 @@ const GameScene: React.FC<GameSceneProps> = ({
   onCollectSyringe, 
   onCollectApple,
   onHitObstacle,
-  onGameOver,
-  lives,
   setMoveLeft,
   setMoveRight
 }) => {
@@ -107,14 +104,6 @@ const GameScene: React.FC<GameSceneProps> = ({
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [currentLane]);
 
-  // Watch lives change
-  useEffect(() => {
-    if (lives <= 0 && gameActiveRef.current) {
-      gameActiveRef.current = false;
-      setTimeout(() => onGameOver(), 500); // Small delay before game over
-    }
-  }, [lives, onGameOver]);
-
   // Spawn new objects - Updated to prevent 3 of the same type in a row
   const spawnObject = () => {
     if (!gameActiveRef.current) return;
@@ -137,9 +126,6 @@ const GameScene: React.FC<GameSceneProps> = ({
     if (Math.random() < 0.75 && usedLanes.length < 2) {
       objectsToSpawn = 2;
     }
-    
-    // MODIFIED: Removed the chance to spawn 3 objects to prevent having all 3 lanes filled
-    // This ensures we never have 3 of the same obstacle type in a row
     
     // Count object types to prevent having all 3 of the same type
     const objectTypes = {
@@ -171,7 +157,7 @@ const GameScene: React.FC<GameSceneProps> = ({
       // Determine what kind of object to spawn
       let type: 'obstacle' | 'syringe' | 'apple';
       
-      // MODIFIED: Prevent spawning more of a type if we already have 2 of that type
+      // Prevent spawning more of a type if we already have 2 of that type
       if (objectTypes.obstacle >= 2) {
         // Don't spawn more obstacles, choose between apple and syringe
         type = Math.random() < 0.7 ? 'apple' : 'syringe';
@@ -265,7 +251,7 @@ const GameScene: React.FC<GameSceneProps> = ({
     if (!gameActiveRef.current) return;
     
     // Increase game speed over time (slightly faster acceleration)
-    speedRef.current = Math.min(60, speedRef.current + delta * 0.25); // Increased max speed and acceleration
+    speedRef.current = Math.min(60, speedRef.current + delta * 0.25);
     
     // Update player position - smooth lane transition
     const targetX = lanes[currentLane];
@@ -293,11 +279,11 @@ const GameScene: React.FC<GameSceneProps> = ({
     gameObjectsRef.current = updatedObjects;
     setGameObjects([...updatedObjects]);
     
-    // Spawn new objects - Increased spawn rate by 30%
+    // Spawn new objects
     spawnTimerRef.current -= delta;
     if (spawnTimerRef.current <= 0) {
       spawnObject();
-      spawnTimerRef.current = 0.3 + Math.random() * 1.0; // Reduced from 0.4-1.6 to 0.3-1.3 seconds
+      spawnTimerRef.current = 0.3 + Math.random() * 1.0;
     }
     
     // Check collisions

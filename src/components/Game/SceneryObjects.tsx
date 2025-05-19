@@ -1,3 +1,4 @@
+
 import React, { Suspense, useRef } from "react";
 import * as THREE from "three";
 import { useFrame } from "@react-three/fiber";
@@ -33,7 +34,7 @@ const SceneryObjects: React.FC<SceneryObjectsProps> = ({ speed }) => {
   const treeRef = useRef<THREE.Mesh>(null); // 🔁 קבוצה שנזיזה בפריים
 
   // 🪨 Rocks in the water (right side)
-  const rocks = Array(0)
+  const rocks = Array(6)
     .fill(0)
     .map((_, i) => ({
       id: i + 1000,
@@ -56,7 +57,7 @@ const SceneryObjects: React.FC<SceneryObjectsProps> = ({ speed }) => {
     }));
 
   // 🌴 Palm trees - now using 3D model
-  const palmTrees = Array(0)
+  const palmTrees = Array(8)
     .fill(0)
     .map((_, i) => ({
       id: i + 2000,
@@ -69,8 +70,8 @@ const SceneryObjects: React.FC<SceneryObjectsProps> = ({ speed }) => {
       leanAngle: Math.random() * 0.3 - 0.15,
     }));
 
-  // 🐚 Seashells on beach (disabled)
-  const seashells = Array(0)
+  // 🐚 Seashells on beach
+  const seashells = Array(12)
     .fill(0)
     .map((_, i) => {
       const rightSide = Math.random() > 0.5;
