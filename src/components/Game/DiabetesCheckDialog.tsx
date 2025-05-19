@@ -119,7 +119,8 @@ const DiabetesCheckDialog: React.FC<DiabetesCheckDialogProps> = ({
             Diabetes Check
           </DialogTitle>
           <DialogDescription>
-            It's time for your regular blood glucose check. Please enter your current reading before continuing the game.
+            It's time for your regular blood glucose check. Please enter your
+            current reading before continuing the game.
           </DialogDescription>
         </DialogHeader>
 
@@ -147,12 +148,12 @@ const DiabetesCheckDialog: React.FC<DiabetesCheckDialogProps> = ({
                 className={`
                 ${
                   feedbackMessage.type === "low"
-                    ? "bg-[#FEC6A1] border-blue-300"
+                    ? "bg-[#ADD8E6] border-blue-500"
                     : ""
                 } 
                 ${
                   feedbackMessage.type === "normal"
-                    ? "bg-[#F2FCE2] border-green-400"
+                    ? "bg-[#A8E6CF] border-green-500"
                     : ""
                 }
                 ${
