@@ -89,7 +89,7 @@ const DiabetesCheckDialog: React.FC<DiabetesCheckDialogProps> = ({
         message: "I need to drink some water or take a shot and retest.",
         type: "high",
       });
-      setCanContinue(true);
+      setCanContinue(false);
     }
 
     try {
@@ -129,14 +129,14 @@ const DiabetesCheckDialog: React.FC<DiabetesCheckDialogProps> = ({
         message: "This food contains too much sugar or carbs. Try something with more protein and less sugar.",
         type: "high",
       });
-      setCanContinue(false);
+      setCanContinue(true);
       toast.warning("Not an ideal food choice for low blood glucose");
     } else {
       setFeedbackMessage({
         message: "This food doesn't have enough carbs to raise your blood glucose. Try something with more carbs.",
         type: "low",
       });
-      setCanContinue(false);
+      setCanContinue(true);
       toast.warning("This food may not help with low blood glucose");
     }
   };
