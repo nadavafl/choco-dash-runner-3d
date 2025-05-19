@@ -104,6 +104,9 @@ const FoodRecognition: React.FC<FoodRecognitionProps> = ({
 
       const food = res.data.foods?.[0];
       if (food) {
+
+        console.log(food.foodNutrients.map(n => n.nutrientName));
+
         const nutritionData = {
           description: food.description,
           calories:
