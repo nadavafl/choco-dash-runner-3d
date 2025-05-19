@@ -8,6 +8,8 @@ import StartScreen from './StartScreen';
 import RegistrationScreen from './RegistrationScreen';
 import TouchControls from './TouchControls';
 import BackgroundMusic from './BackgroundMusic';
+import SettingsButton from './SettingsButton';
+import SettingsDialog from './SettingsDialog';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { Button } from '@/components/ui/button';
 import { Volume2, VolumeX } from 'lucide-react';
@@ -28,6 +30,7 @@ const GameContainer: React.FC = () => {
   const [showDiabetesCheck, setShowDiabetesCheck] = useState(false);
   const diabetesCheckTimerRef = useRef<NodeJS.Timeout | null>(null);
   const lastMidnightCheckRef = useRef<Date>(new Date());
+  const [showSettings, setShowSettings] = useState(false);
   
   // Player movement controls - referenced by TouchControls
   const [moveLeft, setMoveLeft] = useState<() => void>(() => () => {});
@@ -263,6 +266,17 @@ const GameContainer: React.FC = () => {
         onInit={handleMusicInit}
       />
 
+      {/* Settings button - visible on all screens */}
+      <SettingsButton onClick={() => setShowSettings(true)} />
+
+      {/* Settings Dialog */}
+      <SettingsDialog
+        open={showSettings}
+        onClose={() => setShowSettings(false)}
+        username={username}
+        highScore={highScore}
+      />
+
       {/* Music toggle button - now visible on all screens */}
       <MusicToggleButton />
 
@@ -300,7 +314,7 @@ const GameContainer: React.FC = () => {
 
       {(gameState === "playing" || gameState === "paused") && (
         <>
-          <HUD score={score} highScore={highScore} />
+          <HUD score={score} highScore={highScore} isPaused={gameState === 'paused'} />
           {isMobile && gameState === "playing" && (
             <TouchControls onSwipeLeft={moveLeft} onSwipeRight={moveRight} />
           )}
