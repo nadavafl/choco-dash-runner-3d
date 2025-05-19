@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import {
   Dialog,
@@ -65,19 +64,19 @@ const DiabetesCheckDialog: React.FC<DiabetesCheckDialogProps> = ({
     // Determine feedback message based on blood glucose value
     const bloodGlucoseValue = Number(values.bloodGlucose);
     
-    if (bloodGlucoseValue < 80) {
+    if (bloodGlucoseValue < 70) {
       setFeedbackMessage({
-        message: "Low blood sugar – please eat something and retest.",
+        message: "I am week, lets go eat and retest afterward.",
         type: "low",
       });
-    } else if (bloodGlucoseValue >= 80 && bloodGlucoseValue < 120) {
+    } else if (bloodGlucoseValue >= 70 && bloodGlucoseValue < 140) {
       setFeedbackMessage({
-        message: "Well done! Your test result is normal!",
+        message: "Oh great! I can continue playing.",
         type: "normal",
       });
     } else {
       setFeedbackMessage({
-        message: "You need to take care of yourself immediately and retest afterward.",
+        message: "I need to drink some water or take a shout and retest.",
         type: "high",
       });
     }
@@ -155,7 +154,7 @@ const DiabetesCheckDialog: React.FC<DiabetesCheckDialogProps> = ({
                 className={`
                 ${
                   feedbackMessage.type === "low"
-                    ? "bg-[#FEC6A1] border-orange-400"
+                    ? "bg-[#FEC6A1] border-blue-300"
                     : ""
                 } 
                 ${
