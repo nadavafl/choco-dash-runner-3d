@@ -3,7 +3,7 @@ import React, { useRef, useState, useEffect } from "react";
 import * as tf from "@tensorflow/tfjs";
 import * as mobilenet from "@tensorflow-models/mobilenet";
 import axios from "axios";
-import { Check, Camera, X, Loader2 } from "lucide-react";
+import { Check, Camera, X, Loader2, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -25,6 +25,7 @@ const FoodRecognition: React.FC<FoodRecognitionProps> = ({
   const imageRef = useRef<HTMLImageElement | null>(null);
   const modelRef = useRef<mobilenet.MobileNet | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const [analysisCompleted, setAnalysisCompleted] = useState(false);
 
   useEffect(() => {
     const loadModel = async () => {
@@ -58,6 +59,7 @@ const FoodRecognition: React.FC<FoodRecognitionProps> = ({
     setImageURL(url);
     setPrediction(null);
     setNutrition(null);
+    setAnalysisCompleted(false);
   };
 
   const triggerFileInput = () => {
@@ -74,6 +76,7 @@ const FoodRecognition: React.FC<FoodRecognitionProps> = ({
 
     setLoading(true);
     setAnalyzing(true);
+    setAnalysisCompleted(false);
     try {
       const predictions = await modelRef.current.classify(imageRef.current);
       const label = predictions[0]?.className.split(",")[0];
@@ -125,6 +128,7 @@ const FoodRecognition: React.FC<FoodRecognitionProps> = ({
         };
 
         setNutrition(nutritionData);
+        setAnalysisCompleted(true);
 
         // Determine the effect on blood glucose based on carbs/sugar content
         // This is a simplified approach - in a real app, this would be more sophisticated
@@ -139,11 +143,13 @@ const FoodRecognition: React.FC<FoodRecognitionProps> = ({
         toast.success("Nutrition information retrieved");
       } else {
         setNutrition(null);
+        setAnalysisCompleted(false);
         toast.error("No nutritional data found for this food");
       }
     } catch (err) {
       console.error(err);
       setNutrition(null);
+      setAnalysisCompleted(false);
       toast.error("Failed to fetch nutrition information");
     } finally {
       setLoading(false);
@@ -204,25 +210,27 @@ const FoodRecognition: React.FC<FoodRecognitionProps> = ({
                 )}
               </div>
 
-              <Button
-                onClick={classifyImage}
-                className="bg-purple-600 hover:bg-purple-700 text-white w-full md:w-auto flex items-center justify-center gap-2"
-                disabled={loading || analyzing}
-              >
-                {loading || analyzing ? (
-                  <>
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                    Analyzing...
-                  </>
-                ) : (
-                  <>
-                    <Check className="h-4 w-4" />
-                    Analyze Food
-                  </>
-                )}
-              </Button>
+              {!analysisCompleted && (
+                <Button
+                  onClick={classifyImage}
+                  className="bg-purple-600 hover:bg-purple-700 text-white w-full md:w-auto flex items-center justify-center gap-2"
+                  disabled={loading || analyzing}
+                >
+                  {loading || analyzing ? (
+                    <>
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                      Analyzing...
+                    </>
+                  ) : (
+                    <>
+                      <Check className="h-4 w-4" />
+                      Analyze Food
+                    </>
+                  )}
+                </Button>
+              )}
 
-              {!loading && !analyzing && (
+              {!loading && !analyzing && !analysisCompleted && (
                 <Button
                   onClick={triggerFileInput}
                   variant="outline"
@@ -268,6 +276,16 @@ const FoodRecognition: React.FC<FoodRecognitionProps> = ({
                 <div className="font-medium">Sugar:</div>
                 <div>{nutrition.sugar} g</div>
               </div>
+              
+              {analysisCompleted && (
+                <Button 
+                  onClick={() => onFoodAnalyzed(nutrition.carbs < 15 ? "low" : nutrition.carbs > 30 ? "high" : "normal")}
+                  className="mt-4 w-full bg-green-600 hover:bg-green-700 text-white flex items-center justify-center gap-2"
+                >
+                  Proceed to Diabetes Check
+                  <ArrowRight className="h-4 w-4" />
+                </Button>
+              )}
             </div>
           )}
 

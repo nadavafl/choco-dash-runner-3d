@@ -304,15 +304,9 @@ const DiabetesCheckDialog: React.FC<DiabetesCheckDialogProps> = ({
               </Alert>
             )}
             
-            <DialogFooter>
-              <Button
-                onClick={handleContinue}
-                disabled={!canContinue || isWaitingForAnalysis}
-                className={`${(!canContinue || isWaitingForAnalysis) ? 'opacity-50 cursor-not-allowed' : ''}`}
-              >
-                {isWaitingForAnalysis ? 'Analyzing Food...' : 'Continue Playing'}
-              </Button>
-            </DialogFooter>
+            {/* Note: We've removed the "Continue Playing" button from here.
+                Instead, the user will use the "Proceed to Diabetes Check" button
+                in the FoodRecognition component after successful analysis */}
           </div>
         )}
       </DialogContent>
