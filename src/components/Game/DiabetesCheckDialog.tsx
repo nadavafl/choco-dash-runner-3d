@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import {
   Dialog,
@@ -111,7 +110,8 @@ const DiabetesCheckDialog: React.FC<DiabetesCheckDialogProps> = ({
         message: "Blood glucose is high. Consider drinking water or taking medication as needed.",
         type: "high",
       });
-      setHasValidReading(true);
+      setHasValidReading(false); // High readings are not valid for continuing
+      toast.error("High blood glucose detected. Please recheck after taking appropriate measures.");
     }
 
     try {
@@ -276,7 +276,31 @@ const DiabetesCheckDialog: React.FC<DiabetesCheckDialogProps> = ({
                       {isSubmitting ? "Submitting..." : "Submit Reading"}
                     </Button>
                   </>
+                ) : feedbackMessage.type === "normal" ? (
+                  // For normal blood glucose, show only Continue button
+                  <div className="w-full">
+                    <Button
+                      type="button"
+                      onClick={handleContinue}
+                      className="w-full flex items-center justify-center gap-2"
+                    >
+                      Continue
+                    </Button>
+                  </div>
+                ) : feedbackMessage.type === "high" ? (
+                  // For high blood glucose, show only New Reading button
+                  <div className="w-full">
+                    <Button
+                      type="submit"
+                      className="w-full flex items-center justify-center gap-2"
+                      disabled={isSubmitting}
+                    >
+                      <Check className="h-4 w-4" />
+                      Recheck Blood Sugar
+                    </Button>
+                  </div>
                 ) : (
+                  // For low blood glucose, keep existing logic (can lead to food recognition)
                   <div className="w-full flex flex-col sm:flex-row gap-2">
                     <Button
                       type="button"
