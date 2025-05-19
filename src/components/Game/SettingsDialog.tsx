@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -32,6 +32,25 @@ const SettingsDialog: React.FC<SettingsDialogProps> = ({
   
   // Days of the week for selection
   const daysOfWeek = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+  
+  // Load clubs from localStorage when component mounts
+  useEffect(() => {
+    const savedClubs = localStorage.getItem('chocoDashClubs');
+    if (savedClubs) {
+      try {
+        setClubs(JSON.parse(savedClubs));
+      } catch (error) {
+        console.error("Error parsing clubs from localStorage:", error);
+        // Initialize with empty array if parse fails
+        setClubs([]);
+      }
+    }
+  }, []);
+  
+  // Save clubs to localStorage whenever they change
+  useEffect(() => {
+    localStorage.setItem('chocoDashClubs', JSON.stringify(clubs));
+  }, [clubs]);
   
   const handleAddClub = () => {
     if (newClub.name && clubs.length < 2) {
