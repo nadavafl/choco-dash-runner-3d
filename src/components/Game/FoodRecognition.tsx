@@ -1,3 +1,4 @@
+
 import React, { useRef, useState, useEffect } from "react";
 import * as tf from "@tensorflow/tfjs";
 import * as mobilenet from "@tensorflow-models/mobilenet";
@@ -6,8 +7,7 @@ import { Check, Camera, X, Loader2, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-
-const USDA_API_KEY = "yGHmAbrKp6cLbdsgDhMMlsgKf9P9Pb18BYGgPFhM";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface FoodRecognitionProps {
   onFoodAnalyzed: (bloodGlucoseEffect: "low" | "normal" | "high") => void;
@@ -25,6 +25,8 @@ const FoodRecognition: React.FC<FoodRecognitionProps> = ({
   const modelRef = useRef<mobilenet.MobileNet | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [analysisCompleted, setAnalysisCompleted] = useState(false);
+  const proceedButtonRef = useRef<HTMLButtonElement>(null);
+  const isMobile = useIsMobile();
 
   useEffect(() => {
     const loadModel = async () => {
@@ -49,6 +51,18 @@ const FoodRecognition: React.FC<FoodRecognitionProps> = ({
     };
     loadModel();
   }, []);
+
+  // Automatically scroll to the "Proceed" button when analysis is completed on mobile
+  useEffect(() => {
+    if (analysisCompleted && proceedButtonRef.current && isMobile) {
+      setTimeout(() => {
+        proceedButtonRef.current?.scrollIntoView({ 
+          behavior: 'smooth', 
+          block: 'center' 
+        });
+      }, 300);
+    }
+  }, [analysisCompleted, isMobile]);
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -298,16 +312,18 @@ const FoodRecognition: React.FC<FoodRecognitionProps> = ({
             </div>
           )}
           
-          {/* Always show the "Proceed to Diabetes Check" button once analysis is completed,
-              regardless of the analysis result or even if nutrition data wasn't found */}
+          {/* Proceed button wrapped in a container that's always visible */}
           {analysisCompleted && (
-            <Button 
-              onClick={handleProceedToDiabetesCheck}
-              className="mt-4 w-full bg-green-600 hover:bg-green-700 text-white flex items-center justify-center gap-2"
-            >
-              Proceed to Diabetes Check
-              <ArrowRight className="h-4 w-4" />
-            </Button>
+            <div className="w-full mt-4 pb-4">
+              <Button 
+                ref={proceedButtonRef}
+                onClick={handleProceedToDiabetesCheck}
+                className="w-full bg-green-600 hover:bg-green-700 text-white flex items-center justify-center gap-2"
+              >
+                Proceed to Diabetes Check
+                <ArrowRight className="h-4 w-4" />
+              </Button>
+            </div>
           )}
 
           {!loading && !analyzing && prediction && !nutrition && (

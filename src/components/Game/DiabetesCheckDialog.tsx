@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import {
   Dialog,
@@ -186,7 +187,7 @@ const DiabetesCheckDialog: React.FC<DiabetesCheckDialogProps> = ({
 
   return (
     <Dialog open={open}>
-      <DialogContent className="max-w-md [&>button:last-child]:hidden">
+      <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto [&>button:last-child]:hidden">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-xl">
             <Syringe className="h-6 w-6 text-game-primary" />
@@ -324,7 +325,7 @@ const DiabetesCheckDialog: React.FC<DiabetesCheckDialogProps> = ({
             </form>
           </Form>
         ) : (
-          <div className="space-y-4">
+          <div className="space-y-4 pb-4">
             <FoodRecognition onFoodAnalyzed={handleFoodAnalyzed} />
             
             {feedbackMessage.type && (
