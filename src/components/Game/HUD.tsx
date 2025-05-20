@@ -50,7 +50,7 @@ const HUD: React.FC<HUDProps> = ({
         <div className="flex justify-between items-center w-full">
           <Badge
             variant="outline"
-            className="bg-game-dark text-game-light px-3 py-1 text-sm flex items-center gap-2"
+            className="bg-game-dark text-game-light px-3 py-1 text-base flex items-center gap-2"
           >
             <Gamepad className="h-4 w-4" />
             <span>Score: {score}</span>
@@ -68,7 +68,7 @@ const HUD: React.FC<HUDProps> = ({
 
           <Badge
             variant="outline"
-            className="bg-game-dark text-game-light px-3 py-1 text-sm flex items-center gap-2"
+            className="bg-game-dark text-game-light px-3 py-1 text-lg flex items-center gap-2"
           >
             <Trophy className="h-4 w-4 text-yellow-500" />
             <span>High Score: {highScore}</span>
