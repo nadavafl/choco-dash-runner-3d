@@ -46,11 +46,11 @@ const HUD: React.FC<HUDProps> = ({
       </div>
 
       {/* Mobile: Bottom HUD - adjusted to be less intrusive */}
-      <div className="block md:hidden absolute bottom-5 left-0 right-0 px-4 z-40 pointer-events-none">
+      <div className="block md:hidden absolute bottom-4 left-0 right-0 px-4 z-40 pointer-events-none">
         <div className="flex justify-between items-center w-full">
           <Badge
             variant="outline"
-            className="bg-game-dark bg-opacity-80 text-game-light px-3 py-1 text-base flex items-center gap-2"
+            className="bg-game-dark bg-opacity-80 text-game-light px-3 py-1 text-sm flex items-center gap-2"
           >
             <Gamepad className="h-4 w-4" />
             <span>Score: {score}</span>
@@ -68,7 +68,7 @@ const HUD: React.FC<HUDProps> = ({
 
           <Badge
             variant="outline"
-            className="bg-game-dark bg-opacity-80 text-game-light px-3 py-1 text-base flex items-center gap-2"
+            className="bg-game-dark bg-opacity-80 text-game-light px-3 py-1 text-sm flex items-center gap-2"
           >
             <Trophy className="h-4 w-4 text-yellow-500" />
             <span>High Score: {highScore}</span>
