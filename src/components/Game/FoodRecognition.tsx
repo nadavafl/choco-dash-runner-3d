@@ -9,6 +9,8 @@ import { toast } from "sonner";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useIsMobile } from "@/hooks/use-mobile";
 
+const USDA_API_KEY = "yGHmAbrKp6cLbdsgDhMMlsgKf9P9Pb18BYGgPFhM";
+
 interface FoodRecognitionProps {
   onFoodAnalyzed: (bloodGlucoseEffect: "low" | "normal" | "high") => void;
 }
